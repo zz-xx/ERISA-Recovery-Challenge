@@ -3,6 +3,8 @@ from django.views.generic import ListView, DetailView
 from .models import Claim
 from typing import Any, Dict
 
+from urllib.parse import urlencode
+
 # Create your views here.
 
 
@@ -15,7 +17,7 @@ class ClaimListView(ListView):
     model = Claim
     template_name = "claims/claim_list.html"
     context_object_name = "claims"
-    # paginate_by = 20
+    # paginate_by = 50
 
     def get_queryset(self):
         """
@@ -39,6 +41,21 @@ class ClaimListView(ListView):
         if status_filter:
             # Filter by status
             queryset = queryset.filter(status=status_filter.upper())
+        
+        # --- New Sorting Logic ---
+        sort_by = self.request.GET.get('sort', 'id') # Default sort by 'id'
+        direction = self.request.GET.get('dir', 'asc')  # Default direction 'asc'
+
+        # Whitelist of fields we allow sorting on to prevent misuse
+        allowed_sort_fields = [
+            'id', 'patient_name', 'billed_amount', 'paid_amount', 
+            'status', 'insurer_name', 'discharge_date'
+        ]
+
+        if sort_by in allowed_sort_fields:
+            if direction == 'desc':
+                sort_by = f'-{sort_by}'
+            queryset = queryset.order_by(sort_by)
 
         return queryset
 
@@ -47,10 +64,21 @@ class ClaimListView(ListView):
         Adds the claim status choices and current filter values to the context.
         """
         context = super().get_context_data(**kwargs)
-        context["claim_statuses"] = Claim.ClaimStatus.choices
-        context["current_search"] = self.request.GET.get("search", "")
-        context["current_status"] = self.request.GET.get("status", "")
+        context['claim_statuses'] = Claim.ClaimStatus.choices
+        context['current_search'] = self.request.GET.get('search', '')
+        context['current_status'] = self.request.GET.get('status', '')
+        
+        # --- New Sorting Context --- 
+        current_sort = self.request.GET.get('sort', 'id')
+        current_dir = self.request.GET.get('dir', 'asc')
+        context['current_sort'] = current_sort
+        context['current_dir'] = current_dir
+        
+        # Helper for the template to easily flip the direction
+        context['next_dir'] = 'desc' if current_dir == 'asc' else 'asc'
+
         return context
+    
 
     def get_template_names(self):
         """

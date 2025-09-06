@@ -1,29 +1,164 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ERISA Recovery Claims{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
     <style>
+        :root {
+            --pico-font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+            --pico-font-size: 16px;
+        }
+
+        [data-theme="light"] {
+            --pico-background-color: #f8f9fa;
+            --pico-color: #212529;
+            --table-border-color: #dee2e6;
+            --table-header-background: #e9ecef;
+            --table-row-hover-color: #f1f3f5;
+            --card-background-color: #ffffff;
+            --detail-view-background: #f8f9fa;
+        }
+
+        [data-theme="dark"] {
+            --pico-background-color: #161b22;
+            --pico-color: #c9d1d9;
+            --table-border-color: #30363d;
+            --table-header-background: #21262d;
+            --table-row-hover-color: #282e35;
+            --card-background-color: #1e242c;
+            --detail-view-background: #21262d;
+        }
+
+        /* --- General & Table Fixes --- */
         body {
-            padding-bottom: 5rem;
+            font-size: var(--pico-font-size);
         }
 
-        .htmx-indicator {
-            opacity: 0;
-            transition: opacity 200ms ease-in;
+        h1 {
+            color: var(--pico-color);
+            opacity: 0.9;
         }
 
-        .htmx-request .htmx-indicator {
-            opacity: 1;
+        figure {
+            padding: 0;
+            margin: 0;
+            border: 1px solid var(--table-border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: var(--card-background-color);
         }
 
-        .htmx-request.htmx-indicator {
-            opacity: 1;
+        table {
+            --pico-table-border-color: var(--table-border-color);
+            --pico-table-row-stripped-background-color: transparent;
         }
+
+        th,
+        td {
+            border: none;
+            border-bottom: 1px solid var(--table-border-color);
+            padding: 0.8rem 1rem;
+            white-space: nowrap;
+        }
+
+        tbody tr:last-of-type td {
+            border-bottom: none;
+        }
+
+        thead th {
+            background-color: var(--table-header-background);
+            font-weight: 700;
+            color: var(--pico-color);
+        }
+
+        tbody tr:hover {
+            background-color: var(--table-row-hover-color);
+        }
+
+        .claim-id-link {
+            color: var(--pico-primary);
+            font-weight: 700;
+        }
+
+        .inserted-detail-row td {
+            background-color: var(--detail-view-background);
+            white-space: normal;
+        }
+
+        /* --- Color & Icon Fixes --- */
+        .status-badge {
+            padding: 0.25em 0.6em;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border-radius: 0.375rem;
+            color: #fff;
+        }
+
+        .status-paid {
+            background-color: #28a745;
+        }
+
+        .status-denied {
+            background-color: #dc3545;
+        }
+
+        .status-under-review {
+            background-color: #fd7e14;
+        }
+
+        .text-success {
+            color: #28a745;
+        }
+
+        .text-danger {
+            color: #dc3545;
+        }
+
+        [data-theme="dark"] .text-success {
+            color: #52b788;
+        }
+
+        [data-theme="dark"] .text-danger {
+            color: #ff758f;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            padding: 0.2rem;
+            cursor: pointer;
+            line-height: 0;
+        }
+
+        .action-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--pico-muted-color);
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .action-btn:hover svg {
+            stroke: var(--pico-primary-hover);
+        }
+
+        .action-btn.flag-btn:not(.flagged) svg {
+            stroke: var(--pico-muted-color);
+        }
+
+        /* Default flag color */
+        .action-btn.flag-btn.flagged svg {
+            stroke: #dc3545;
+        }
+
+        /* Red flag icon */
     </style>
 </head>
 
@@ -31,17 +166,35 @@
     <main class="container">
         <nav>
             <ul>
-                <li><strong><a href="/">Claims Dashboard</a></strong></li>
+                <li><strong><a href="/">Claim Analysis Dashboard</a></strong></li>
+            </ul>
+            <ul>
+                <li><button
+                        @click="document.documentElement.dataset.theme = (document.documentElement.dataset.theme === 'light' ? 'dark' : 'light')"
+                        class="secondary outline" title="Toggle theme" x-data><svg xmlns="http://www.w3.org/2000/svg"
+                            width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg></button></li>
             </ul>
         </nav>
-
         {% block content %}{% endblock %}
-
     </main>
-    <script src="https://unpkg.com/htmx.org@1.9.10"
-        integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
-        crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        document.body.addEventListener('htmx:beforeRequest', function (event) {
+            const trigger = event.detail.elt;
+            if (trigger.classList.contains('js-view-details-btn')) {
+                const dataRow = trigger.closest('tr');
+                const nextRow = dataRow.nextElementSibling;
+                if (nextRow && nextRow.classList.contains('inserted-detail-row')) {
+                    nextRow.remove();
+                    event.preventDefault();
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

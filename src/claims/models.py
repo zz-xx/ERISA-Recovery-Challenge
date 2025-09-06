@@ -10,25 +10,26 @@ class Claim(models.Model):
     """
     Represents a single insurance claim.
     """
-
+    
     class ClaimStatus(models.TextChoices):
-        PENDING = "PENDING", "Pending"
-        PAID = "PAID", "Paid"
-        DENIED = "DENIED", "Denied"
-        APPEALED = "APPEALED", "Appealed"
+        PAID = 'PAID', 'Paid'
+        DENIED = 'DENIED', 'Denied'
+        UNDER_REVIEW = 'UNDER REVIEW', 'Under Review'
 
     id = models.IntegerField(primary_key=True, editable=False)
-    patient_name = models.CharField(max_length=255)
+    # Add index for faster searching
+    patient_name = models.CharField(max_length=255, db_index=True)
     billed_amount = models.DecimalField(max_digits=10, decimal_places=2)
     paid_amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(
-        max_length=10, choices=ClaimStatus.choices, default=ClaimStatus.PENDING
+        max_length=20,
+        choices=ClaimStatus.choices,
+        db_index=True  # Add index for faster filtering
     )
-    insurer_name = models.CharField(max_length=255)
+    # Add index for faster searching
+    insurer_name = models.CharField(max_length=255, db_index=True)
     discharge_date = models.DateField()
-    is_flagged = models.BooleanField(
-        default=False, help_text="Flag this claim for special review."
-    )
+    is_flagged = models.BooleanField(default=False, help_text="Flag this claim for special review.") # Renamed for clarity
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

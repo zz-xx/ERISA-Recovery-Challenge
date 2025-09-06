@@ -1,22 +1,26 @@
 {% extends "base.html" %}
-
 {% block title %}Claims List{% endblock %}
-
 {% block content %}
-    <header>
-        <h1>All Claims</h1>
-    </header>
-
-    <form method="get" action="{% url 'claims:claim-list' %}">
+    <header><h1>All Claims</h1></header>
+    <form 
+        hx-get="{% url 'claims:claim-list' %}"
+        hx-trigger="change from:select, keyup changed delay:300ms from:input[type='search']"
+        hx-target="#claims-tbody"
+        hx-push-url="true">
         <div class="grid">
-            <input type="search" id="search" name="search" placeholder="Search by Patient or Insurer..." value="{{ current_search }}">
-            <select id="status" name="status">
-                <option value="">All Statuses</option>
-                {% for value, label in claim_statuses %}
+            <div style="grid-column: 1 / 4;"><input type="search" name="search" placeholder="Search by Patient or Insurer..." value="{{ current_search }}"></div>
+            
+            <div style="grid-column: 4 / 5; display: flex; align-items: center; position: relative;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 0.75rem; pointer-events: none; color: var(--pico-muted-color);">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+                <select name="status" style="padding-left: 2.25rem; width: 100%;">
+                    <option value="">All Statuses</option>
+                    {% for value, label in claim_statuses %}
                     <option value="{{ value }}" {% if value == current_status %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit">Filter</button>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
     </form>
     
@@ -24,20 +28,19 @@
         <table role="grid">
             <thead>
                 <tr>
-                    <th scope="col">Patient Name</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Insurer</th>
+                    <th scope="col">Claim ID</th>
+                    <th scope="col">Patient</th>
                     <th scope="col" style="text-align: right;">Billed</th>
                     <th scope="col" style="text-align: right;">Paid</th>
-                    <th scope="col" style="text-align: right;">Underpayment</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Insurer</th>
+                    <th scope="col">Discharge Date</th>
                     <th scope="col">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                {# This includes the first page of rows #}
+            <tbody id="claims-tbody">
                 {% include 'claims/partials/_claim_rows.html' %}
             </tbody>
         </table>
     </figure>
-
 {% endblock %}
