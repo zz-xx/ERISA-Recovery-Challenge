@@ -27,7 +27,6 @@ class ClaimDataIngestor:
     A service class to handle the ingestion of claim data from CSV files.
     """
 
-    # --- MODIFICATION 1: Add delimiter to the constructor ---
     def __init__(
         self, claims_csv_path: Path, details_csv_path: Path, delimiter: str = ","
     ):
@@ -66,7 +65,7 @@ class ClaimDataIngestor:
         print("Processing the main claims file...")
         try:
             with open(self.claims_csv_path, mode="r", encoding="utf-8") as f:
-                # --- MODIFICATION 2: Use the specified delimiter ---
+                
                 reader = csv.DictReader(f, delimiter=self.delimiter)
                 for i, row in enumerate(reader, start=2):
                     try:
@@ -101,9 +100,10 @@ class ClaimDataIngestor:
     def _load_claim_details(self) -> None:
         """Loads the claim detail records from the provided CSV file."""
         print("Processing the details file...")
+        
         try:
             with open(self.details_csv_path, mode="r", encoding="utf-8") as f:
-                # --- MODIFICATION 3: Use the specified delimiter here as well ---
+                
                 reader = csv.DictReader(f, delimiter=self.delimiter)
                 for i, row in enumerate(reader, start=2):
                     try:
@@ -129,6 +129,7 @@ class ClaimDataIngestor:
                         )
                     except (ValueError, KeyError) as e:
                         self._log_error(i, self.details_csv_path.name, str(e))
+        
         except FileNotFoundError:
             self.errors.append(f"File not found: {self.details_csv_path}")
             raise

@@ -65,7 +65,7 @@ class Note(models.Model):
     claim = models.ForeignKey(Claim, on_delete=models.CASCADE, related_name="notes")
     note = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
-    # user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True) # For bonus user auth
+    # user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True) # For user auth
 
     def __str__(self) -> str:
         note_preview: str = (

@@ -20,7 +20,7 @@ class Command(BaseCommand):
             type=Path,
             help="The path to the CSV file containing claim detail data.",
         )
-        # --- MODIFICATION: Add an optional argument for the delimiter ---
+        # Add an optional argument for the delimiter
         parser.add_argument(
             "--delimiter",
             type=str,
@@ -45,7 +45,7 @@ class Command(BaseCommand):
             )
         )
 
-        # --- MODIFICATION: Pass the delimiter to the ingestor ---
+        # Pass the delimiter to the ingestor 
         ingestor = ClaimDataIngestor(
             claims_csv_path, details_csv_path, delimiter=delimiter
         )

@@ -1,17 +1,27 @@
 {% load humanize %}{% for claim in claims %}
+
 <tr>
-    <td class="claim-id-link"><strong>{{ claim.id }}</strong></td>
-    <td><strong>{{ claim.patient_name }}</strong></td>
-    <td style="text-align: right;"><strong>${{ claim.billed_amount|floatformat:2|intcomma }}</strong></td>
-    <td style="text-align: right;"
-        class="{% if claim.status == 'DENIED' %}text-danger{% elif claim.paid_amount > 0 %}text-success{% endif %}">
-        <strong>${{ claim.paid_amount|floatformat:2|intcomma }}</strong>
+    <td class="claim-id-link">
+        {{ claim.id }}
     </td>
-    <td><span class="status-badge status-{{ claim.status|slugify }}">{{ claim.get_status_display }}</span></td>
+    <td>
+        <strong>{{ claim.patient_name }}</strong>
+    </td>
+    <td>
+        ${{ claim.billed_amount|floatformat:2|intcomma }}
+    </td>
+    <td class="{% if claim.status == 'DENIED' %}text-danger{% elif claim.paid_amount > 0 %}text-success{% endif %}">
+        ${{ claim.paid_amount|floatformat:2|intcomma }}
+    </td>
+    <td>
+        <span class="status-badge status-{{ claim.status|slugify }}">{{ claim.get_status_display }}</span>
+    </td>
     <td>{{ claim.insurer_name }}</td>
     <td>{{ claim.discharge_date }}</td>
+    
     <td>
         <div style="display: flex; gap: 0.5rem;">
+            
             <button class="action-btn js-view-details-btn" title="View Details"
                 hx-get="{% url 'claims:claim-detail' claim.id %}" hx-target="closest tr" hx-swap="afterend">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -26,14 +36,18 @@
                     <line x1="4" y1="22" x2="4" y2="15"></line>
                 </svg>
             </button>
+
         </div>
     </td>
 </tr>
+
 {% endfor %}
 
-{# Infinite scroll trigger is unchanged #}
+{# Infinite scroll trigger #}
+
 {% if page_obj.has_next %}
 <tr hx-get="?page={{ page_obj.next_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}"
     hx-trigger="revealed" hx-swap="outerHTML">
 </tr>
+
 {% endif %}

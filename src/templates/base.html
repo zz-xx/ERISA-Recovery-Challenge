@@ -8,11 +8,15 @@
     <title>{% block title %}ERISA Recovery Claims{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Fira Sans + Fira Mono -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100..900;1,100..900&family=Fira+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
     <style>
         :root {
-            --pico-font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+            --pico-font-family: "Fira Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
             --pico-font-size: 16px;
         }
 
@@ -36,9 +40,9 @@
             --detail-view-background: #21262d;
         }
 
-        /* --- General & Table Fixes --- */
         body {
             font-size: var(--pico-font-size);
+            font-family: var(--pico-font-family);
         }
 
         h1 {
@@ -56,15 +60,51 @@
         }
 
         table {
+            font-size: 1.1rem;
             --pico-table-border-color: var(--table-border-color);
             --pico-table-row-stripped-background-color: transparent;
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        /* Adjust specific column widths */
+        table colgroup col.claim-id-col {
+            width: 11%;
+        }
+
+        table colgroup col.patient-col {
+            width: 14%;
+        }
+
+        table colgroup col.billed-col {
+            width: 14%;
+        }
+
+        table colgroup col.paid-col {
+            width: 14%;
+        }
+
+        table colgroup col.status-col {
+            width: 10%;
+        }
+
+        table colgroup col.insurer-col {
+            width: 12%;
+        }
+
+        table colgroup col.discharge-col {
+            width: 11%;
+        }
+
+        table colgroup col.actions-col {
+            width: 6%;
         }
 
         th,
         td {
             border: none;
             border-bottom: 1px solid var(--table-border-color);
-            padding: 0.8rem 1rem;
+            padding: 1.5rem 1rem;
             white-space: nowrap;
         }
 
@@ -74,17 +114,21 @@
 
         thead th {
             background-color: var(--table-header-background);
-            font-weight: 700;
+            /* font-weight: 700; */
             color: var(--pico-color);
         }
 
-        tbody tr:hover {
-            background-color: var(--table-row-hover-color);
+        /* Soft blue hover only on data rows (skip header & detail rows) */
+        tbody tr:not(.inserted-detail-row):hover>* {
+            background-color: rgb(239 246 255 / 0.5);
+            /* apply to cells */
         }
 
+        /* Claim ID links in Fira Mono */
         .claim-id-link {
+            font-family: "Fira Mono", monospace;
             color: var(--pico-primary);
-            font-weight: 700;
+            font-weight: 400;
         }
 
         .inserted-detail-row td {
@@ -110,7 +154,7 @@
         }
 
         .status-under-review {
-            background-color: #fd7e14;
+            background-color: rgba(30, 64, 175, 0.600);
         }
 
         .text-success {
@@ -149,16 +193,15 @@
             stroke: var(--pico-primary-hover);
         }
 
-        .action-btn.flag-btn:not(.flagged) svg {
-            stroke: var(--pico-muted-color);
-        }
-
-        /* Default flag color */
-        .action-btn.flag-btn.flagged svg {
+        .action-btn.flag-btn svg {
             stroke: #dc3545;
         }
 
-        /* Red flag icon */
+        /* When flagged, fill it red */
+        .action-btn.flag-btn.flagged svg {
+            fill: #dc3545;
+            stroke: #dc3545;
+        }
     </style>
 </head>
 
@@ -169,19 +212,24 @@
                 <li><strong><a href="/">Claim Analysis Dashboard</a></strong></li>
             </ul>
             <ul>
-                <li><button
+                <li>
+                    <button
                         @click="document.documentElement.dataset.theme = (document.documentElement.dataset.theme === 'light' ? 'dark' : 'light')"
                         class="secondary outline" title="Toggle theme" x-data><svg xmlns="http://www.w3.org/2000/svg"
                             width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                        </svg></button></li>
+                        </svg>
+                    </button>
+                </li>
             </ul>
         </nav>
         {% block content %}{% endblock %}
     </main>
+
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <script>
         document.body.addEventListener('htmx:beforeRequest', function (event) {
             const trigger = event.detail.elt;
