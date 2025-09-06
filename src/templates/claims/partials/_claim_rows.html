@@ -1,0 +1,31 @@
+{% for claim in claims %}
+    <tr>
+        <td>{{ claim.patient_name }}</td>
+        <td><span class="status-{{ claim.status|lower }}">{{ claim.get_status_display }}</span></td>
+        <td>{{ claim.insurer_name }}</td>
+        <td style="text-align: right;">${{ claim.billed_amount|floatformat:2 }}</td>
+        <td style="text-align: right;">${{ claim.paid_amount|floatformat:2 }}</td>
+        <td style="text-align: right;">${{ claim.underpayment|floatformat:2 }}</td>
+        <td>
+            <button
+                hx-get="{% url 'claims:claim-detail' claim.id %}"
+                hx-target="#claim-details-{{ claim.id }}"
+                hx-swap="innerHTML"
+            >
+                View Details
+            </button>
+        </td>
+    </tr>
+    <tr class="claim-detail-row">
+        <td colspan="7" id="claim-details-{{ claim.id }}">
+        </td>
+    </tr>
+{% endfor %}
+
+{# This is the invisible trigger for the next page #}
+{% if page_obj.has_next %}
+    <tr hx-get="?page={{ page_obj.next_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}"
+        hx-trigger="revealed"
+        hx-swap="outerHTML">
+    </tr>
+{% endif %}

@@ -1,0 +1,30 @@
+<article style="margin-top: 1rem; border-left: 4px solid var(--pico-primary);">
+    <header>
+        <strong>Details for Claim #{{ claim.id }}</strong>
+    </header>
+    <div class="grid">
+        <div>
+            <strong>Patient:</strong> {{ claim.patient_name }}
+        </div>
+        <div>
+            <strong>Discharge Date:</strong> {{ claim.discharge_date }}
+        </div>
+    </div>
+    <div class="grid">
+        <div>
+            <strong>CPT Codes:</strong> {{ claim.details.cpt_codes }}
+        </div>
+        <div>
+            <strong>Denial Reason:</strong>
+            {% if claim.details.denial_reason and claim.details.denial_reason != "N/A" %}
+                {{ claim.details.denial_reason }}
+            {% else %}
+                <span style="color: var(--pico-muted-color);">None</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer>
+        <p><strong>Notes Section (coming soon)</strong></p>
+    </footer>
+</article>

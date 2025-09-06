@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ERISA Recovery Claims{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+    <style>
+        body {
+            padding-bottom: 5rem;
+        }
+
+        .htmx-indicator {
+            opacity: 0;
+            transition: opacity 200ms ease-in;
+        }
+
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+        }
+
+        .htmx-request.htmx-indicator {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <nav>
+            <ul>
+                <li><strong><a href="/">Claims Dashboard</a></strong></li>
+            </ul>
+        </nav>
+
+        {% block content %}{% endblock %}
+
+    </main>
+    <script src="https://unpkg.com/htmx.org@1.9.10"
+        integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+        crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</body>
+
+</html>

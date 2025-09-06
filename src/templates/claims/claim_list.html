@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Claims List{% endblock %}
+
+{% block content %}
+    <header>
+        <h1>All Claims</h1>
+    </header>
+
+    <form method="get" action="{% url 'claims:claim-list' %}">
+        <div class="grid">
+            <input type="search" id="search" name="search" placeholder="Search by Patient or Insurer..." value="{{ current_search }}">
+            <select id="status" name="status">
+                <option value="">All Statuses</option>
+                {% for value, label in claim_statuses %}
+                    <option value="{{ value }}" {% if value == current_status %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Filter</button>
+        </div>
+    </form>
+    
+    <figure>
+        <table role="grid">
+            <thead>
+                <tr>
+                    <th scope="col">Patient Name</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Insurer</th>
+                    <th scope="col" style="text-align: right;">Billed</th>
+                    <th scope="col" style="text-align: right;">Paid</th>
+                    <th scope="col" style="text-align: right;">Underpayment</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {# This includes the first page of rows #}
+                {% include 'claims/partials/_claim_rows.html' %}
+            </tbody>
+        </table>
+    </figure>
+
+{% endblock %}
