@@ -20,7 +20,7 @@ class ClaimListView(ListView):
     model = Claim
     template_name = "claims/claim_list.html"
     context_object_name = "claims"
-    # paginate_by = 50
+    paginate_by = 50
 
     def get_queryset(self):
         """
@@ -33,7 +33,7 @@ class ClaimListView(ListView):
         # Get search/filter parameters from the URL
         search_query = self.request.GET.get("search", "")
         status_filter = self.request.GET.get("status", "")
-        flagged_filter = self.request.GET.get("flagged", "") # Add this line
+        flagged_filter = self.request.GET.get("flagged", "")
 
         if search_query:
             # Search by patient name or insurer name (case-insensitive)
@@ -45,9 +45,9 @@ class ClaimListView(ListView):
         if status_filter:
             # Filter by status
             queryset = queryset.filter(status=status_filter.upper())
-        
+
         # filter by flagged status
-        if flagged_filter == 'true':
+        if flagged_filter == "true":
             queryset = queryset.filter(is_flagged=True)
 
         return queryset
@@ -57,13 +57,11 @@ class ClaimListView(ListView):
         Adds the claim status choices and current filter values to the context.
         """
         context = super().get_context_data(**kwargs)
-        context['claim_statuses'] = Claim.ClaimStatus.choices
-        context['current_search'] = self.request.GET.get('search', '')
-        context['current_status'] = self.request.GET.get('status', '')
-        context['current_flagged'] = self.request.GET.get('flagged', '')
-
+        context["claim_statuses"] = Claim.ClaimStatus.choices
+        context["current_search"] = self.request.GET.get("search", "")
+        context["current_status"] = self.request.GET.get("status", "")
+        context["current_flagged"] = self.request.GET.get("flagged", "")
         return context
-    
 
     def get_template_names(self):
         """
@@ -90,7 +88,7 @@ class ClaimDetailView(DetailView):
         """Adds the claim's notes to the context."""
         context = super().get_context_data(**kwargs)
         # Order notes by most recent first
-        context['notes'] = self.object.notes.all().order_by('-created_at')
+        context["notes"] = self.object.notes.all().order_by("-created_at")
         return context
 
 
@@ -100,10 +98,10 @@ class ToggleFlagView(View):
     def post(self, request, claim_id):
         claim = get_object_or_404(Claim, id=claim_id)
         claim.is_flagged = not claim.is_flagged
-        claim.save(update_fields=['is_flagged'])
-        
+        claim.save(update_fields=["is_flagged"])
+
         # Return the updated button template
-        return render(request, 'claims/partials/_flag_button.html', {'claim': claim})
+        return render(request, "claims/partials/_flag_button.html", {"claim": claim})
 
 
 class AddNoteView(View):
@@ -111,11 +109,11 @@ class AddNoteView(View):
 
     def post(self, request, claim_id):
         claim = get_object_or_404(Claim, id=claim_id)
-        note_text = request.POST.get('note', '').strip()
+        note_text = request.POST.get("note", "").strip()
 
         if note_text:
             Note.objects.create(claim=claim, note=note_text)
-        
+
         # Return the updated notes list
-        notes = claim.notes.all().order_by('-created_at')
-        return render(request, 'claims/partials/_notes_section.html', {'notes': notes})
+        notes = claim.notes.all().order_by("-created_at")
+        return render(request, "claims/partials/_notes_section.html", {"notes": notes})
