@@ -33,6 +33,7 @@ class ClaimListView(ListView):
         # Get search/filter parameters from the URL
         search_query = self.request.GET.get("search", "")
         status_filter = self.request.GET.get("status", "")
+        flagged_filter = self.request.GET.get("flagged", "") # Add this line
 
         if search_query:
             # Search by patient name or insurer name (case-insensitive)
@@ -44,6 +45,10 @@ class ClaimListView(ListView):
         if status_filter:
             # Filter by status
             queryset = queryset.filter(status=status_filter.upper())
+        
+        # filter by flagged status
+        if flagged_filter == 'true':
+            queryset = queryset.filter(is_flagged=True)
 
         return queryset
 
@@ -55,6 +60,7 @@ class ClaimListView(ListView):
         context['claim_statuses'] = Claim.ClaimStatus.choices
         context['current_search'] = self.request.GET.get('search', '')
         context['current_status'] = self.request.GET.get('status', '')
+        context['current_flagged'] = self.request.GET.get('flagged', '')
 
         return context
     

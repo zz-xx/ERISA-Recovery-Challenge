@@ -202,6 +202,41 @@
             fill: #dc3545;
             stroke: #dc3545;
         }
+
+        /* styles for the flagged filter button === */
+
+        .flag-filter-btn {
+            width: auto;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        #flagged-filter:checked+label {
+            /* Use the light blue from the row hover */
+            background-color: rgb(239 246 255 / 1);
+            border-color: rgb(219 234 254 / 1);
+            box-shadow: none;
+            color: var(--pico-primary-hover);
+        }
+
+        #flagged-filter:checked+label svg {
+            fill: #dc3545;
+            stroke: #dc3545;
+        }
+
+        /* sTYLES for the large flag indicator --- */
+        .flag-indicator-large svg {
+            width: 24px;
+            height: 24px;
+            fill: #dc3545;
+            stroke: #dc3545;
+            stroke-width: 1.5;
+            vertical-align: middle;
+        }
     </style>
 </head>
 

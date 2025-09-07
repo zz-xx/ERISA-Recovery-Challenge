@@ -7,44 +7,55 @@
     
     <form 
         hx-get="{% url 'claims:claim-list' %}"
-        hx-trigger="change from:select, keyup changed delay:300ms from:input[type='search']"
+        hx-trigger="change from:select, keyup changed delay:300ms from:input[type='search'], change from:#flagged-filter"
         hx-target="#claims-tbody"
         hx-push-url="true">
 
-        <div class="grid">
-
-            <div style="grid-column: 1 / 4;"><input type="search" name="search" placeholder="Search by Patient or Insurer..." value="{{ current_search }}">
-            </div>
+        <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem;">
             
-            <div style="grid-column: 4 / 5; display: flex; align-items: center; position: relative;">
+            <div style="flex-grow: 1;">
+                <input type="search" name="search" placeholder="Search by Patient or Insurer..." value="{{ current_search }}" style="margin-bottom: 0;">
+            </div>
 
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 0.75rem; pointer-events: none; color: var(--pico-muted-color);">
+            <div style="position: relative; min-width: 20rem; flex-shrink: 0;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--pico-muted-color);">
                     <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                 </svg>
-
-                <select name="status" style="padding-left: 2.25rem; width: 100%;">
+                <select name="status" style="padding-left: 2.25rem; width: 100%; margin-bottom: 0;">
                     <option value="">All Statuses</option>
                     {% for value, label in claim_statuses %}
                     <option value="{{ value }}" {% if value == current_status %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
-
             </div>
+
+            <div style="flex-shrink: 0;">
+                <input type="checkbox" id="flagged-filter" name="flagged" value="true" style="display: none;" {% if current_flagged == 'true' %}checked{% endif %}>
+                <label for="flagged-filter" role="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                        <line x1="4" y1="22" x2="4" y2="15"></line>
+                    </svg>
+                    View Flagged
+                </label>
+            </div>
+
         </div>
+
     </form>
     
     <figure>
         <table role="grid">
             <colgroup>
-    <col class="claim-id-col">
-    <col class="patient-col">
-    <col class="billed-col">
-    <col class="paid-col">
-    <col class="status-col">
-    <col class="insurer-col">
-    <col class="discharge-col">
-    <col class="actions-col">
-  </colgroup>
+                <col class="claim-id-col">
+                <col class="patient-col">
+                <col class="billed-col">
+                <col class="paid-col">
+                <col class="status-col">
+                <col class="insurer-col">
+                <col class="discharge-col">
+                <col class="actions-col">
+            </colgroup>
             <thead>
                 <tr>
                     <th scope="col">Claim ID</th>

@@ -2,7 +2,16 @@
     <td colspan="8">
 
         <article>
-            <header> <strong>Details for Claim #{{ claim.id }}</strong>
+            <header style="display: flex; align-items: center; justify-content: space-between;">
+                <strong>Details for Claim #{{ claim.id }}</strong>
+                {% if claim.is_flagged %}
+                    <span class="flag-indicator-large" title="This claim is flagged for review">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                            <line x1="4" y1="22" x2="4" y2="15"></line>
+                        </svg>
+                    </span>
+                {% endif %}
             </header>
             
             <div class="grid">
