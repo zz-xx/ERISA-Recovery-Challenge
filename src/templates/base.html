@@ -231,6 +231,32 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <script>
+
+        // standard Django-recommended script to get the CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        // Add the token to all HTMX POST, PUT, DELETE requests
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            if (!['get', 'head', 'options', 'trace'].includes(event.detail.verb)) {
+                event.detail.headers['X-CSRFToken'] = csrftoken;
+            }
+        });
+
+        // script to handle detail view toggling
         document.body.addEventListener('htmx:beforeRequest', function (event) {
             const trigger = event.detail.elt;
             if (trigger.classList.contains('js-view-details-btn')) {

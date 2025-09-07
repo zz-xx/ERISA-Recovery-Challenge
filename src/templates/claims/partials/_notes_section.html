@@ -1,0 +1,10 @@
+{% load humanize %}{% for note in notes %}
+<article class="note">
+    <p>{{ note.note }}</p>
+    <footer>
+        <small>Added on {{ note.created_at|date:"N j, Y, P" }}</small>
+    </footer>
+</article>
+{% empty %}
+<p>No notes for this claim yet.</p>
+{% endfor %}

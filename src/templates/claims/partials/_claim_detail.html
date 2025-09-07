@@ -23,7 +23,22 @@
             </div>
 
             <footer>
-                <p><strong>Notes Section (coming soon)</strong></p>
+                <div id="notes-section-{{ claim.id }}">
+                    <h5>Notes</h5>
+                    {% include 'claims/partials/_notes_section.html' %}
+                </div>
+            
+                <form
+                    hx-post="{% url 'claims:add-note' claim.id %}"
+                    hx-target="#notes-section-{{ claim.id }}"
+                    hx-swap="innerHTML"
+                    class="add-note-form"
+                    hx-on::after-request="this.reset()"
+                >
+                    {% csrf_token %}
+                    <textarea name="note" placeholder="Add a new note..." required></textarea>
+                    <button type="submit">Add Note</button>
+                </form>
             </footer>
 
         </article>

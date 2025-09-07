@@ -1,9 +1,12 @@
-from django.db.models import Q
-from django.views.generic import ListView, DetailView
-from .models import Claim
 from typing import Any, Dict
-
 from urllib.parse import urlencode
+
+from django.db.models import Q
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, render
+from django.views.generic import DetailView, ListView, View
+
+from .models import Claim, Note
 
 # Create your views here.
 
@@ -76,3 +79,37 @@ class ClaimDetailView(DetailView):
     template_name = "claims/partials/_claim_detail.html"
     context_object_name = "claim"
     pk_url_kwarg = "claim_id"  # Tells DetailView to look for 'claim_id' from the URL
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        """Adds the claim's notes to the context."""
+        context = super().get_context_data(**kwargs)
+        # Order notes by most recent first
+        context['notes'] = self.object.notes.all().order_by('-created_at')
+        return context
+
+
+class ToggleFlagView(View):
+    """Toggles the 'is_flagged' status of a claim."""
+
+    def post(self, request, claim_id):
+        claim = get_object_or_404(Claim, id=claim_id)
+        claim.is_flagged = not claim.is_flagged
+        claim.save(update_fields=['is_flagged'])
+        
+        # Return the updated button template
+        return render(request, 'claims/partials/_flag_button.html', {'claim': claim})
+
+
+class AddNoteView(View):
+    """Adds a new note to a claim."""
+
+    def post(self, request, claim_id):
+        claim = get_object_or_404(Claim, id=claim_id)
+        note_text = request.POST.get('note', '').strip()
+
+        if note_text:
+            Note.objects.create(claim=claim, note=note_text)
+        
+        # Return the updated notes list
+        notes = claim.notes.all().order_by('-created_at')
+        return render(request, 'claims/partials/_notes_section.html', {'notes': notes})

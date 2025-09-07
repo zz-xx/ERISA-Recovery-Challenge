@@ -30,12 +30,7 @@
                 </svg>
             </button>
 
-            <button class="action-btn flag-btn {% if claim.is_flagged %}flagged{% endif %}" title="Flag for Review">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                    <line x1="4" y1="22" x2="4" y2="15"></line>
-                </svg>
-            </button>
+            {% include 'claims/partials/_flag_button.html' %}
 
         </div>
     </td>
