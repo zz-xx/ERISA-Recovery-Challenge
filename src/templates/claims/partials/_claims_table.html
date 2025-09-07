@@ -22,12 +22,59 @@
                         Claim ID {% sort_indicator 'id' %}
                     </a>
                 </th>
-                <th scope="col">Patient</th>
-                <th scope="col">Billed</th>
-                <th scope="col">Paid</th>
+                
+                {# === PATIENT SORTABLE === #}
+                <th scope="col">
+                    <a class="sort-link" style="cursor: pointer; white-space: nowrap;"
+                hx-get="{% sort_url 'patient_name' %}" 
+                hx-target="#claims-table-wrapper" 
+                hx-push-url="true">
+                Patient {% sort_indicator 'patient_name' %}
+                    </a>
+                </th>
+
+                {# === BILLED SORTABLE === #}
+                <th scope="col">
+                    <a class="sort-link" style="cursor: pointer; white-space: nowrap;"
+                hx-get="{% sort_url 'billed_amount' %}" 
+                hx-target="#claims-table-wrapper" 
+                hx-push-url="true">
+                Billed {% sort_indicator 'billed_amount' %}
+                    </a>
+                </th>
+
+                {# === PAID SORTABLE === #}
+                <th scope="col">
+                    <a class="sort-link" style="cursor: pointer; white-space: nowrap;"
+                hx-get="{% sort_url 'paid_amount' %}" 
+                hx-target="#claims-table-wrapper" 
+                hx-push-url="true">
+                Paid {% sort_indicator 'paid_amount' %}
+                    </a>
+                </th>
+
                 <th scope="col">Status</th>
-                <th scope="col">Insurer</th>
-                <th scope="col">Discharge Date</th>
+                
+                {# === INSURER SORTABLE === #}
+                <th scope="col">
+                    <a class="sort-link" style="cursor: pointer; white-space: nowrap;"
+                hx-get="{% sort_url 'insurer_name' %}" 
+                hx-target="#claims-table-wrapper" 
+                hx-push-url="true">
+                Insurer {% sort_indicator 'insurer_name' %}
+                    </a>
+                </th>
+
+                {# === DISCHARGE DATE SORTABLE === #}
+                <th scope="col">
+                    <a class="sort-link" style="cursor: pointer; white-space: nowrap;"
+                hx-get="{% sort_url 'discharge_date' %}" 
+                hx-target="#claims-table-wrapper" 
+                hx-push-url="true">
+                Discharge Date {% sort_indicator 'discharge_date' %}
+                    </a>
+                </th>
+
                 <th scope="col">Actions</th>
             </tr>
         </thead>
