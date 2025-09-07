@@ -47,8 +47,10 @@
 {# Infinite scroll trigger #}
 
 {% if page_obj.has_next %}
-<tr hx-get="?page={{ page_obj.next_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_flagged == 'true' %}&flagged=true{% endif %}"
+{# Add the _partial=rows parameter to the hx-get URL #}
+<tr hx-get="?page={{ page_obj.next_page_number }}&sort={{ current_sort_param }}&search={{ current_search }}&status={{ current_status }}&flagged={{ current_flagged }}&_partial=rows"
     hx-trigger="revealed" hx-swap="outerHTML">
+    <td colspan="8" style="text-align: center;">Loading more claims...</td>
 </tr>
 
 {% endif %}

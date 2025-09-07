@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load claim_tags %}
+
 {% block title %}Claims List{% endblock %}
 {% block content %}
     <header>
@@ -8,8 +10,10 @@
     <form 
         hx-get="{% url 'claims:claim-list' %}"
         hx-trigger="change from:select, keyup changed delay:300ms from:input[type='search'], change from:#flagged-filter"
-        hx-target="#claims-tbody"
+        hx-target="#claims-table-wrapper"
         hx-push-url="true">
+
+        <input type="hidden" name="sort" value="{{ request.GET.sort|default:'id' }}">
 
         <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem;">
             
@@ -24,12 +28,14 @@
                 <select name="status" style="padding-left: 2.25rem; width: 100%; margin-bottom: 0;">
                     <option value="">All Statuses</option>
                     {% for value, label in claim_statuses %}
+                    {# Added spaces around == otherwise syntax error#}
                     <option value="{{ value }}" {% if value == current_status %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
             </div>
 
             <div style="flex-shrink: 0;">
+                {# Added spaces around == otherwise syntax error #}
                 <input type="checkbox" id="flagged-filter" name="flagged" value="true" style="display: none;" {% if current_flagged == 'true' %}checked{% endif %}>
                 <label for="flagged-filter" role="button">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -41,37 +47,8 @@
             </div>
 
         </div>
-
     </form>
     
-    <figure>
-        <table role="grid">
-            <colgroup>
-                <col class="claim-id-col">
-                <col class="patient-col">
-                <col class="billed-col">
-                <col class="paid-col">
-                <col class="status-col">
-                <col class="insurer-col">
-                <col class="discharge-col">
-                <col class="actions-col">
-            </colgroup>
-            <thead>
-                <tr>
-                    <th scope="col">Claim ID</th>
-                    <th scope="col">Patient</th>
-                    <th scope="col"">Billed</th>
-                    <th scope="col"">Paid</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Insurer</th>
-                    <th scope="col">Discharge Date</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="claims-tbody">
-                {% include 'claims/partials/_claim_rows.html' %}
-            </tbody>
-        </table>
-    </figure>
+    {% include "claims/partials/_claims_table.html" %}
 
 {% endblock %}

@@ -26,14 +26,26 @@ class ClaimListView(ListView):
         """
         Overrides the default queryset to implement search and filter functionality.
         """
-        queryset = (
-            super().get_queryset().select_related("details").order_by("-discharge_date")
-        )
+        # 
+        queryset = super().get_queryset().select_related("details")
 
         # Get search/filter parameters from the URL
         search_query = self.request.GET.get("search", "")
         status_filter = self.request.GET.get("status", "")
         flagged_filter = self.request.GET.get("flagged", "")
+        
+        # Get sorting parameters from the URL
+        sort_by = self.request.GET.get("sort", "id") # Default sort
+        
+        # Whitelist of fields that can be sorted
+        allowed_sort_fields = ['id', 'patient_name', 'billed_amount', 'paid_amount', 'status', 'insurer_name', 'discharge_date']
+        
+        # Validate the sort_by parameter
+        sort_field = sort_by.lstrip('-')
+        if sort_field not in allowed_sort_fields:
+            sort_by = '-discharge_date' # Fallback to default if invalid
+
+        queryset = queryset.order_by(sort_by)
 
         if search_query:
             # Search by patient name or insurer name (case-insensitive)
@@ -54,22 +66,39 @@ class ClaimListView(ListView):
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """
-        Adds the claim status choices and current filter values to the context.
+        Adds filter and sorting values to the context for use in the template.
         """
         context = super().get_context_data(**kwargs)
-        context["claim_statuses"] = Claim.ClaimStatus.choices
-        context["current_search"] = self.request.GET.get("search", "")
-        context["current_status"] = self.request.GET.get("status", "")
-        context["current_flagged"] = self.request.GET.get("flagged", "")
+        
+        # 
+        context['request'] = self.request
+
+        # Current filter values
+        context['claim_statuses'] = Claim.ClaimStatus.choices
+        context['current_search'] = self.request.GET.get('search', '')
+        context['current_status'] = self.request.GET.get('status', '')
+        context['current_flagged'] = self.request.GET.get('flagged', '')
+        
+        # Current sort values
+        sort_param = self.request.GET.get("sort", "id")
+        context['current_sort_param'] = sort_param
+        context['current_sort_field'] = sort_param.lstrip('-')
+        context['current_sort_dir'] = 'desc' if sort_param.startswith('-') else 'asc'
+
         return context
 
     def get_template_names(self):
         """
-        If the request is from HTMX, return the partial template containing
-        only the table rows. Otherwise, return the full template.
+        If the request is from HTMX, return the correct partial.
+        - For infinite scroll, return just the rows.
+        - For sorting/filtering, return the entire table.
         """
         if self.request.htmx:
-            return ["claims/partials/_claim_rows.html"]
+            # Check for our custom parameter to identify an infinite scroll request
+            if self.request.GET.get('_partial') == 'rows':
+                return ["claims/partials/_claim_rows.html"]
+            # Otherwise, it's a sort or filter, so return the whole table
+            return ["claims/partials/_claims_table.html"]
         return ["claims/claim_list.html"]
 
 

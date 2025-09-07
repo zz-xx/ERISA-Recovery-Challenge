@@ -1,0 +1,38 @@
+{% load claim_tags %}
+
+{# The ID on this figure is the new target for all HTMX swaps #}
+<figure id="claims-table-wrapper">
+    <table role="grid">
+        <colgroup>
+            <col class="claim-id-col">
+            <col class="patient-col">
+            <col class="billed-col">
+            <col class="paid-col">
+            <col class="status-col">
+            <col class="insurer-col">
+            <col class="discharge-col">
+            <col class="actions-col">
+        </colgroup>
+        <thead>
+            <tr>
+                <th scope="col">
+                    {# This link will now be correctly re-rendered on every sort/filter action #}
+                    <a class="sort-link" style="cursor: pointer; white-space: nowrap;" hx-get="{% sort_url 'id' %}"
+                        hx-target="#claims-table-wrapper" hx-push-url="true">
+                        Claim ID {% sort_indicator 'id' %}
+                    </a>
+                </th>
+                <th scope="col">Patient</th>
+                <th scope="col">Billed</th>
+                <th scope="col">Paid</th>
+                <th scope="col">Status</th>
+                <th scope="col">Insurer</th>
+                <th scope="col">Discharge Date</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="claims-tbody">
+            {% include 'claims/partials/_claim_rows.html' %}
+        </tbody>
+    </table>
+</figure>
