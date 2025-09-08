@@ -204,6 +204,8 @@
         }
 
         /* styles for the flagged filter button === */
+        
+        
 
         .flag-filter-btn {
             width: auto;
@@ -237,6 +239,8 @@
             stroke-width: 1.5;
             vertical-align: middle;
         }
+        
+
     </style>
 </head>
 
@@ -247,16 +251,37 @@
                 <li><strong><a href="/">Claim Analysis Dashboard</a></strong></li>
             </ul>
             <ul>
-                <li>
+                {% if user.is_authenticated %}
+                <li>Hi, <strong>{{ user.username }}</strong></li>
+
+                <li style="display: flex; align-items: center; gap: 0.75rem;">
+                    <form action="{% url 'logout' %}" method="post" style="margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit" class="secondary outline"
+                            style="padding: 0.5rem 1rem; margin: 0;">Logout</button>
+                    </form>
+
                     <button
                         @click="document.documentElement.dataset.theme = (document.documentElement.dataset.theme === 'light' ? 'dark' : 'light')"
-                        class="secondary outline" title="Toggle theme" x-data><svg xmlns="http://www.w3.org/2000/svg"
-                            width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        class="secondary outline" title="Toggle theme" x-data>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
                     </button>
                 </li>
+                {% else %}
+                <li>
+                    <button
+                        @click="document.documentElement.dataset.theme = (document.documentElement.dataset.theme === 'light' ? 'dark' : 'light')"
+                        class="secondary outline" title="Toggle theme" x-data>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                </li>
+                {% endif %}
             </ul>
         </nav>
         {% block content %}{% endblock %}

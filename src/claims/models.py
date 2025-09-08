@@ -3,6 +3,8 @@ from django.db import models
 from django.utils import timezone
 from typing import Optional
 
+from django.contrib.auth.models import User
+
 # Create your models here.
 
 
@@ -30,6 +32,11 @@ class Claim(models.Model):
     insurer_name = models.CharField(max_length=255, db_index=True)
     discharge_date = models.DateField()
     is_flagged = models.BooleanField(default=False, help_text="Flag this claim for special review.") # Renamed for clarity
+    
+    # for keeping track of flags
+    flagged_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='flagged_claims')
+    flagged_at = models.DateTimeField(null=True, blank=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -65,7 +72,7 @@ class Note(models.Model):
     claim = models.ForeignKey(Claim, on_delete=models.CASCADE, related_name="notes")
     note = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
-    # user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True) # For user auth
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True) # For user auth
 
     def __str__(self) -> str:
         note_preview: str = (

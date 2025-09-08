@@ -1,10 +1,15 @@
-{% load humanize %}{% for note in notes %}
-<article class="note">
-    <p>{{ note.note }}</p>
+{% load humanize %}
+
+{% for note in notes %}
+<article>
+    <p>{{ note.note|linebreaksbr }}</p>
     <footer>
-        <small>Added on {{ note.created_at|date:"N j, Y, P" }}</small>
+        <small>
+            Added by <strong>{{ note.user.username|default:"Unknown" }}</strong>
+            {{ note.created_at|naturaltime }}
+        </small>
     </footer>
 </article>
 {% empty %}
-<p>No notes for this claim yet.</p>
+<p>No notes have been added yet.</p>
 {% endfor %}

@@ -1,9 +1,10 @@
 from typing import Any, Dict
 from urllib.parse import urlencode
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
 from django.views.generic import DetailView, ListView, View
 
 from .models import Claim, Note
@@ -11,7 +12,7 @@ from .models import Claim, Note
 # Create your views here.
 
 
-class ClaimListView(ListView):
+class ClaimListView(LoginRequiredMixin, ListView):
     """
     Displays a list of all claims in the Claims Dashboard.
     Supports searching by insurer name and filtering by status.
@@ -102,7 +103,7 @@ class ClaimListView(ListView):
         return ["claims/claim_list.html"]
 
 
-class ClaimDetailView(DetailView):
+class ClaimDetailView(LoginRequiredMixin, DetailView):
     """
     Handles fetching and displaying the details for a single claim.
     This view is designed to be called via an HTMX request.
@@ -121,19 +122,35 @@ class ClaimDetailView(DetailView):
         return context
 
 
-class ToggleFlagView(View):
+class ToggleFlagView(LoginRequiredMixin, View):
     """Toggles the 'is_flagged' status of a claim."""
 
     def post(self, request, claim_id):
         claim = get_object_or_404(Claim, id=claim_id)
         claim.is_flagged = not claim.is_flagged
-        claim.save(update_fields=["is_flagged"])
 
-        # Return the updated button template
-        return render(request, "claims/partials/_flag_button.html", {"claim": claim})
+        # track user and timestamp
+        if claim.is_flagged:
+            # If the claim is now flagged, record who and when
+            claim.flagged_by = request.user
+            claim.flagged_at = timezone.now()
+        else:
+            # If the flag is removed, clear the fields
+            claim.flagged_by = None
+            claim.flagged_at = None
+        
+        claim.save(update_fields=["is_flagged", "flagged_by", "flagged_at"])
+        
+        # Render the button template 
+        response = render(request, "claims/partials/_flag_button.html", {"claim": claim})
+        
+        # Add a special header that broadcasts an event with the claim's ID.
+        response['HX-Trigger'] = f'refresh-claim-detail-{claim_id}'
+        
+        return response
 
 
-class AddNoteView(View):
+class AddNoteView(LoginRequiredMixin, View):
     """Adds a new note to a claim."""
 
     def post(self, request, claim_id):
@@ -141,7 +158,8 @@ class AddNoteView(View):
         note_text = request.POST.get("note", "").strip()
 
         if note_text:
-            Note.objects.create(claim=claim, note=note_text)
+            # update to include user
+            Note.objects.create(claim=claim, note=note_text, user=request.user)
 
         # Return the updated notes list
         notes = claim.notes.all().order_by("-created_at")

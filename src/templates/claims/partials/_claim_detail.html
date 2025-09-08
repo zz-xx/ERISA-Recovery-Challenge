@@ -1,16 +1,23 @@
-<tr class="inserted-detail-row">
-    <td colspan="8">
+{% load humanize %}
 
+<tr class="inserted-detail-row" 
+    hx-get="{% url 'claims:claim-detail' claim.id %}"
+    hx-trigger="refresh-claim-detail-{{ claim.id }} from:body" 
+    hx-target="this" 
+    hx-swap="outerHTML">
+
+    <td colspan="8">
         <article>
             <header style="display: flex; align-items: center; justify-content: space-between;">
                 <strong>Details for Claim #{{ claim.id }}</strong>
                 {% if claim.is_flagged %}
-                    <span class="flag-indicator-large" title="This claim is flagged for review">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                            <line x1="4" y1="22" x2="4" y2="15"></line>
-                        </svg>
-                    </span>
+                <span class="flag-indicator-large" title="This claim is flagged for review">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                        <line x1="4" y1="22" x2="4" y2="15"></line>
+                    </svg>
+                    Flagged by <strong>{{ claim.flagged_by.username|default:"Unknown" }}</strong> {{ claim.flagged_at|naturaltime }}
+                </span>
                 {% endif %}
             </header>
             
@@ -34,7 +41,7 @@
             <footer>
                 <div id="notes-section-{{ claim.id }}">
                     <h5>Notes</h5>
-                    {% include 'claims/partials/_notes_section.html' %}
+                    {% include 'claims/partials/_notes_section.html' with notes=notes %}
                 </div>
             
                 <form
@@ -51,6 +58,5 @@
             </footer>
 
         </article>
-
     </td>
 </tr>
