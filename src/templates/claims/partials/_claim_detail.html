@@ -8,7 +8,7 @@
 
     <td colspan="8">
         <article>
-            <header style="display: flex; align-items: center; justify-content: space-between;">
+            <header class="detail-header">
                 <strong>Details for Claim #{{ claim.id }}</strong>
                 {% if claim.is_flagged %}
                 <span class="flag-indicator-large" title="This claim is flagged for review">
@@ -33,7 +33,7 @@
                     {% if claim.details.denial_reason and claim.details.denial_reason != "N/A" %}
                     {{ claim.details.denial_reason }}
                     {% else %}
-                    <span style="color: var(--pico-muted-color);">None</span>
+                    <span class="text-muted">None</span>
                     {% endif %}
                 </div>
             </div>
