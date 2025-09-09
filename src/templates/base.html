@@ -13,25 +13,22 @@
         href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100..900;1,100..900&family=Fira+Mono:wght@400;500;700&display=swap"
         rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.slate.min.css" />
 
     <style>
         :root {
             --pico-font-family: "Fira Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
         }
 
-        /* --- Theme Color Override --- */
-        /* This selector is specific enough to reliably override the CDN stylesheet. */
-        html[data-theme="light"] {
-            --pico-primary: #1e40af;
-            --pico-primary-background: #dbeafe;
-            --pico-primary-underline: #dbeafe;
-            --pico-primary-hover: #1d4ed8;
-            --pico-primary-focus: rgba(30, 64, 175, 0.25);
-            --pico-primary-inverse: #fff;
+        /* --- Reusable Layout & Text Utilities --- */
+        .text-success {
+            color: #28a745;
         }
 
-        /* --- Reusable Layout & Text Utilities --- */
+        .text-danger {
+            color: #dc3545; /* Use Pico's built-in red */
+        }
+
         .text-center {
             text-align: center;
         }
@@ -69,6 +66,14 @@
         }
 
         /* --- App-Specific Components --- */
+
+        .theme-toggle-btn {
+            padding: 0.7rem;
+            /* Matches vertical padding of logout btn for alignment */
+            line-height: 0;
+            /* for vertically centering the SVG inside */
+        }
+
         .nav-actions {
             display: flex;
             align-items: center;
@@ -85,11 +90,10 @@
         }
 
         .login-card {
-            max-width: 500px;
+            max-width: 30rem;
             margin: 4rem auto;
         }
 
-        /* --- Filter Form --- */
         /* --- Filter Form --- */
         .filter-container {
             display: flex;
@@ -138,6 +142,25 @@
         }
 
         /* --- Table Enhancements --- */
+
+        /* Dark Mode Table Row Hover */
+        /* This rule ONLY applies when the data-theme is 'dark' */
+        html[data-theme="dark"] tbody tr:not(.inserted-detail-row):hover {
+            --pico-background-color: rgba(255, 255, 255, 0.07);
+        }
+
+        table thead th {
+            /* Use Pico's primary color variable for the background */
+            background-color: var(--pico-primary);
+            /* Use Pico's inverse color variable (white in this case) for the text */
+            color: var(--pico-primary-inverse);
+        }
+
+        /* links within the header also use the correct inverse color */
+        table thead th a {
+            color: var(--pico-primary-inverse);
+        }
+
         .table-container {
             overflow-x: auto;
         }
@@ -148,6 +171,7 @@
 
         .claim-id-link {
             font-family: "Fira Mono", monospace;
+            color: var(--pico-secondary);
         }
 
         .actions-cell {
@@ -169,6 +193,16 @@
 
         /* --- Component Styles (Badges, Buttons, etc.) --- */
         .status-badge {
+            /* Flexbox properties for perfect centering */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            /* Responsive, uniform width */
+            min-width: 7.5rem;
+            /* ~120px, but scales with user font size */
+
+            /* Original styling for the bubble appearance */
             padding: 0.4em 0.9em;
             font-size: 0.8rem;
             font-weight: 600;
@@ -217,8 +251,20 @@
             stroke: #dc3545;
         }
 
+        label[for="flagged-filter"] {
+            background-color: var(--pico-primary);
+            /* A light grey background */
+            border-color: var(--pico-primary-border);
+            color: var(--pico-primary-inverse);
+            /* A dark grey text */
+        }
+
+        label[for="flagged-filter"]:hover {
+            background-color: var(--pico-primary-hover);
+        }
+
         #flagged-filter:checked+label {
-            background-color: rgb(239 246 255 / 0.75);
+            background-color: transparent;
             border-color: var(--pico-primary-border);
             color: var(--pico-primary);
         }
@@ -227,50 +273,82 @@
             fill: #dc3545;
             stroke: #dc3545;
         }
+
+        /* --- Responsive Navigation --- */
+        /* This block only applies to screens 768px wide or smaller */
+        @media (max-width: 768px) {
+            nav {
+                /* Stack the brand and the user actions vertically */
+                flex-direction: column;
+                /* Smaller gap between the title and user actions */
+                gap: 0.5rem;
+            }
+
+            /* NEW: Styles for the main title on mobile */
+            nav h2 {
+                /* Make the title font smaller */
+                font-size: 1.5rem;
+                /* Remove the default bottom margin from the heading */
+                margin: 0;
+            }
+
+            nav ul {
+                /* Ensure the user actions don't have extra margin */
+                margin-bottom: 0;
+            }
+        }
+
+
     </style>
 
 </head>
 
 <body>
     <main class="container">
+        {% if user.is_authenticated %}
         <nav>
             <ul>
-                <li><strong><a href="/">Claim Analysis Dashboard</a></strong></li>
+                <li><h2><a href="/">Claims Management System</a></h2></li>
             </ul>
             <ul>
-                {% if user.is_authenticated %}
+                
                 <li>Hi, <strong>{{ user.username }}</strong></li>
 
                 <li class="nav-actions">
                     <form action="{% url 'logout' %}" method="post">
                         {% csrf_token %}
-                        <button type="submit" class="secondary outline"
-                            style="padding: 0.5rem 1rem; margin: 0;">Logout</button>
+                        <button type="submit" class="contrast logout-btn">Logout</button>
                     </form>
 
-                    <button
-                        @click="document.documentElement.dataset.theme = (document.documentElement.dataset.theme === 'light' ? 'dark' : 'light')"
-                        class="secondary outline" title="Toggle theme" x-data>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <button x-data="{ theme: document.documentElement.dataset.theme || 'light' }"
+                        @click="theme = (theme === 'light' ? 'dark' : 'light'); document.documentElement.dataset.theme = theme"
+                        class="secondary outline theme-toggle-btn" title="Toggle theme">
+                        <svg x-show="theme === 'dark'" style="display: none;" xmlns="http://www.w3.org/2000/svg"
+                            width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+
+                        <svg x-show="theme === 'light'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
                     </button>
+
                 </li>
-                {% else %}
-                <li>
-                    <button
-                        @click="document.documentElement.dataset.theme = (document.documentElement.dataset.theme === 'light' ? 'dark' : 'light')"
-                        class="secondary outline" title="Toggle theme" x-data>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                        </svg>
-                    </button>
-                </li>
-                {% endif %}
+                
             </ul>
         </nav>
+        {% endif %}
         {% block content %}{% endblock %}
     </main>
 

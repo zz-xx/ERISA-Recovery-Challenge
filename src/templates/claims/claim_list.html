@@ -3,10 +3,7 @@
 
 {% block title %}Claims List{% endblock %}
 {% block content %}
-    <header>
-        <h1>All Claims</h1>
-    </header>
-    
+
     <form 
         hx-get="{% url 'claims:claim-list' %}"
         hx-trigger="change from:select, keyup changed delay:300ms from:input[type='search'], change from:#flagged-filter"

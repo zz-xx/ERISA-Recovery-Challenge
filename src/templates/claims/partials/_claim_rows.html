@@ -11,7 +11,7 @@
     <td>
         ${{ claim.billed_amount|floatformat:2|intcomma }}
     </td>
-    <td class="{% if claim.status == 'DENIED' %}text-danger{% elif claim.paid_amount > 0 %}text-success{% endif %}">
+    <td class="{% if claim.status|slugify == 'denied' %}text-danger{% elif claim.status|slugify == 'paid' or claim.status|slugify == 'under-review' %}text-success{% endif %}">
         ${{ claim.paid_amount|floatformat:2|intcomma }}
     </td>
     <td>
