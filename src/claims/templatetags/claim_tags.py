@@ -52,3 +52,11 @@ def sort_indicator(context, field_name):
             svg = '<svg width="10" height="10" viewBox="0 0 24 24" style="vertical-align: middle;"><path d="M12 3l-12 18h24z"/></svg>'
             return mark_safe(svg)
     return ""
+
+
+@register.filter(name='split')
+def split(value, key=' '):
+    """
+    Returns the value turned into a list.
+    """
+    return value.split(key)

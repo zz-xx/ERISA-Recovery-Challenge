@@ -1,6 +1,6 @@
 {% load humanize %}
 
-{% for note in notes %}
+{% for note in notes|dictsortreversed:"created_at" %}
 <article>
     <p>{{ note.note|linebreaksbr }}</p>
     <footer>
@@ -10,6 +10,5 @@
         </small>
     </footer>
 </article>
-{% empty %}
-<p>No notes have been added yet.</p>
+
 {% endfor %}
