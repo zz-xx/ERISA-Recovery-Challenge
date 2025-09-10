@@ -79,7 +79,7 @@ class ClaimListView(LoginRequiredMixin, ListView):
         search_query = self.request.GET.get("search", "")
         status_filter = self.request.GET.get("status", "")
         flagged_filter = self.request.GET.get("flagged", "")
-        sort_by = self.request.GET.get("sort", "-discharge_date")  # Default sort.
+        sort_by = self.request.GET.get("sort", "id")  # Default sort.
 
         # Chain the filtering and sorting methods.
         queryset = self._apply_search_filter(queryset, search_query)

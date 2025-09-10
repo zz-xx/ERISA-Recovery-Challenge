@@ -52,7 +52,7 @@ def sort_indicator(context, field_name: str) -> str:
         otherwise an empty string.
     """
     request = context["request"]
-    current_sort = request.GET.get("sort", "")
+    current_sort = request.GET.get("sort", "id")
 
     if current_sort.lstrip("-") == field_name:
         if current_sort.startswith("-"):
