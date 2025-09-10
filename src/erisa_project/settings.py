@@ -108,6 +108,49 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
+# --- Logging Configuration ---
+
+# Automatically create the logs directory if it doesn't exist
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "file": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOG_DIR / "app.log",  # Log file location
+            "maxBytes": 1024 * 1024 * 5,  # 5 MB
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "claims": {
+            "handlers": ["console", "file"],  # Send to both console and file
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django": {
+            "handlers": ["console", "file"],  # Send to both console and file
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 

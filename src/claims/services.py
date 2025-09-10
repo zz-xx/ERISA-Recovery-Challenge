@@ -1,11 +1,15 @@
 import csv
-from decimal import Decimal, InvalidOperation
+import logging
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Dict, Tuple, List, Union, Any
+from typing import Any, Dict, List, Tuple, Union
 
 from django.db import transaction
+
 from .models import Claim, ClaimDetail
+
+logger = logging.getLogger(__name__)
 
 # A type alias for our summary dictionary
 LoadSummary = Dict[str, int]
@@ -43,7 +47,9 @@ class ClaimDataIngestor:
 
     def _log_error(self, row_num: int, file_name: str, error_msg: str) -> None:
         """Helper method to format and store an error message."""
-        self.errors.append(f"Error in {file_name} at row {row_num}: {error_msg}")
+        full_error_msg = f"Error in {file_name} at row {row_num}: {error_msg}"
+        logger.error(full_error_msg)  # Log as an ERROR
+        self.errors.append(full_error_msg)  # Keep for the command's summary
 
     @transaction.atomic
     def run(self) -> Tuple[LoadSummary, List[str]]:
@@ -95,7 +101,7 @@ class ClaimDataIngestor:
 
     def _load_claims(self) -> None:
         """Loads the main claim records from the provided CSV file."""
-        print("Processing the main claims file...")
+        logger.info(f"Processing the main claims file: {self.claims_csv_path.name}")
         try:
             with open(self.claims_csv_path, mode="r", encoding="utf-8") as f:
                 reader = csv.DictReader(f, delimiter=self.delimiter)
@@ -106,12 +112,13 @@ class ClaimDataIngestor:
                     except (ValueError, InvalidOperation, KeyError) as e:
                         self._log_error(i, self.claims_csv_path.name, str(e))
         except FileNotFoundError:
+            logger.critical(f"File not found: {self.claims_csv_path}")
             self.errors.append(f"File not found: {self.claims_csv_path}")
             raise
 
     def _load_claim_details(self) -> None:
         """Loads the claim detail records from the provided CSV file."""
-        print("Processing the details file...")
+        logger.info(f"Processing the details file: {self.details_csv_path.name}")
         try:
             with open(self.details_csv_path, mode="r", encoding="utf-8") as f:
                 reader = csv.DictReader(f, delimiter=self.delimiter)
@@ -140,5 +147,6 @@ class ClaimDataIngestor:
                     except (ValueError, KeyError) as e:
                         self._log_error(i, self.details_csv_path.name, str(e))
         except FileNotFoundError:
+            logger.critical(f"File not found: {self.details_csv_path}")
             self.errors.append(f"File not found: {self.details_csv_path}")
             raise

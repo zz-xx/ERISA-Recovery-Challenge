@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -8,6 +9,8 @@ from django.utils import timezone
 from django.views.generic import DetailView, ListView, View
 
 from .models import Claim, Note
+
+logger = logging.getLogger(__name__)
 
 
 class ClaimListView(LoginRequiredMixin, ListView):
@@ -161,6 +164,11 @@ class ToggleFlagView(LoginRequiredMixin, View):
 
         claim.save(update_fields=["is_flagged", "flagged_by", "flagged_at"])
 
+        logger.info(
+            f"User '{request.user.username}' (ID: {request.user.id}) "
+            f"set is_flagged to {claim.is_flagged} for Claim ID {claim_id}."
+        )
+
         # Render the button's HTML partial in response to the POST request.
         response = render(
             request, "claims/partials/_flag_button.html", {"claim": claim}
@@ -184,7 +192,11 @@ class AddNoteView(LoginRequiredMixin, View):
         note_text = request.POST.get("note", "").strip()
 
         if note_text:
-            Note.objects.create(claim=claim, note=note_text, user=request.user)
+            note = Note.objects.create(claim=claim, note=note_text, user=request.user)
+            logger.info(
+                f"User '{request.user.username}' (ID: {request.user.id}) "
+                f"added Note ID {note.id} to Claim ID {claim_id}."
+            )
 
         # Return the updated notes list, ordered by most recent first.
         notes = claim.notes.all().order_by("-created_at")

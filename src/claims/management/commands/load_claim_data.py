@@ -1,8 +1,11 @@
+import logging
 from pathlib import Path
 
 from django.core.management.base import (BaseCommand, CommandError, CommandParser)
 
 from claims.services import ClaimDataIngestor
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -41,13 +44,8 @@ class Command(BaseCommand):
         if not details_csv_path.exists():
             raise CommandError(f"File not found at: {details_csv_path}")
 
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"Starting data ingestion with '{delimiter}' as the delimiter..."
-            )
-        )
+        logger.info(f"Starting data ingestion with '{delimiter}' as the delimiter...")
 
-        # Pass the delimiter to the ingestor
         ingestor = ClaimDataIngestor(
             claims_csv_path, details_csv_path, delimiter=delimiter
         )
@@ -55,22 +53,17 @@ class Command(BaseCommand):
         try:
             summary, errors = ingestor.run()
         except Exception as e:
+            logger.critical(f"A critical error occurred during ingestion: {e}")
             raise CommandError(f"A critical error occurred during ingestion: {e}")
 
         # Report summary
+        logger.info("--- Ingestion Summary ---")
         for key, value in summary.items():
-            self.stdout.write(
-                self.style.SUCCESS(f"{key.replace('_', ' ').title()}: {value}")
-            )
+            logger.info(f"{key.replace('_', ' ').title()}: {value}")
+        logger.info("-------------------------")
 
         # Report errors
         if errors:
-            self.stdout.write(self.style.WARNING("\nCompleted with some errors:"))
-            for error in errors:
-                self.stdout.write(self.style.ERROR(f" - {error}"))
+            logger.warning("Data ingestion completed with some errors.")
         else:
-            self.stdout.write(
-                self.style.SUCCESS(
-                    "\nData ingestion completed successfully with no errors."
-                )
-            )
+            logger.info("Data ingestion completed successfully with no errors.")
