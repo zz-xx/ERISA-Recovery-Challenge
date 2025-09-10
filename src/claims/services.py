@@ -1,21 +1,11 @@
 import csv
-from decimal import Decimal, InvalidOperation
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Dict, Tuple, List
-import uuid
+from typing import Dict, List, Tuple, Union
 
 from django.db import transaction
-from .models import Claim, ClaimDetail
 
-import csv
-from decimal import Decimal, InvalidOperation
-from datetime import datetime
-from pathlib import Path
-from typing import Dict, Tuple, List
-import uuid
-
-from django.db import transaction
 from .models import Claim, ClaimDetail
 
 # A type alias for our summary dictionary
@@ -28,11 +18,15 @@ class ClaimDataIngestor:
     """
 
     def __init__(
-        self, claims_csv_path: Path, details_csv_path: Path, delimiter: str = ","
+        self,
+        claims_csv_path: Union[Path, str],
+        details_csv_path: Union[Path, str],
+        delimiter: str = ",",
     ):
-        self.claims_csv_path = claims_csv_path
-        self.details_csv_path = details_csv_path
-        self.delimiter = delimiter  # Store the delimiter
+        # to ensure paths are always Path objects for consistency
+        self.claims_csv_path = Path(claims_csv_path)
+        self.details_csv_path = Path(details_csv_path)
+        self.delimiter = delimiter
         self.claims_created = 0
         self.claims_updated = 0
         self.details_created = 0
@@ -65,7 +59,6 @@ class ClaimDataIngestor:
         print("Processing the main claims file...")
         try:
             with open(self.claims_csv_path, mode="r", encoding="utf-8") as f:
-                
                 reader = csv.DictReader(f, delimiter=self.delimiter)
                 for i, row in enumerate(reader, start=2):
                     try:
@@ -100,10 +93,8 @@ class ClaimDataIngestor:
     def _load_claim_details(self) -> None:
         """Loads the claim detail records from the provided CSV file."""
         print("Processing the details file...")
-        
         try:
             with open(self.details_csv_path, mode="r", encoding="utf-8") as f:
-                
                 reader = csv.DictReader(f, delimiter=self.delimiter)
                 for i, row in enumerate(reader, start=2):
                     try:
@@ -129,7 +120,6 @@ class ClaimDataIngestor:
                         )
                     except (ValueError, KeyError) as e:
                         self._log_error(i, self.details_csv_path.name, str(e))
-        
         except FileNotFoundError:
             self.errors.append(f"File not found: {self.details_csv_path}")
             raise
