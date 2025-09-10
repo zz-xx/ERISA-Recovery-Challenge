@@ -22,7 +22,10 @@
                             </svg>
                             Claim Details - {{ claim.id }}
                         </h5>
+                        <span class="status-badge status-{{ claim.status|slugify }}">{{ claim.get_status_display }}</span>
                         {% include 'claims/partials/_flag_button.html' %}
+
+                        
                     </header>
 
                     <div class="grid">
