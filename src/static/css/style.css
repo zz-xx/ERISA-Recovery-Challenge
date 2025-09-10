@@ -1,6 +1,6 @@
 /* 
 These styles complement pico's layout options. We embrace pico instead of fighting it.
-Core idea is to only customize where necessary. For rest of it pico's default styles to keep it simple.
+Core idea is to only customize where necessary. For rest of it, use pico's default styles to keep it simple.
 */
 
 :root {
@@ -91,8 +91,7 @@ Core idea is to only customize where necessary. For rest of it pico's default st
 }
 
 .filter-container .search-field {
-    flex-grow: 1;
-    /* This makes the search bar take up the empty space */
+    flex-grow: 1; /* This makes the search bar take up the empty space */
 }
 
 .filter-container .controls {
@@ -103,8 +102,7 @@ Core idea is to only customize where necessary. For rest of it pico's default st
 .filter-container input,
 .filter-container select,
 .filter-container label {
-    margin-bottom: 0;
-    /* Normalizes vertical alignment */
+    margin-bottom: 0; /* Normalizes vertical alignment */
 }
 
 #flagged-filter {
@@ -131,7 +129,6 @@ Core idea is to only customize where necessary. For rest of it pico's default st
 /* --- Table Enhancements --- */
 
 /* Dark Mode Table Row Hover */
-/* This rule ONLY applies when the data-theme is 'dark' */
 html[data-theme="dark"] tbody tr:not(.inserted-detail-row):hover {
     --pico-background-color: rgba(255, 255, 255, 0.07);
 }
@@ -342,7 +339,7 @@ label[for="flagged-filter"]:hover {
 }
 
 .denial-reason {
-    color: var(--pico-form-element-invalid-color);
+    color: #dc3545;
     font-weight: 600;
 }
 
@@ -366,10 +363,11 @@ label[for="flagged-filter"]:hover {
 }
 
 /* --- Responsive Navigation --- */
+
 /* This block only applies to screens 768px wide or smaller */
 @media (max-width: 768px) {
     nav {
-        /* Stack the brand and the user actions vertically */
+        /* Stack the title and the user actions vertically */
         flex-direction: column;
         /* Smaller gap between the title and user actions */
         gap: 0.5rem;
@@ -377,7 +375,7 @@ label[for="flagged-filter"]:hover {
 
     /* NEW: Styles for the main title on mobile */
     nav h2 {
-        /* Make the title font smaller */
+        /* Make the title font smaller on phone */
         font-size: 1.5rem;
         /* Remove the default bottom margin from the heading */
         margin: 0;
