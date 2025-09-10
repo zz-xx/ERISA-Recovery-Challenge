@@ -1,17 +1,13 @@
 .. _url_endpoints:
 
-Backend: URL Endpoint Reference
+URL Endpoint Reference
 ===============================
 
-Reference for all the URL endpoints available in the application.
-
----------------------
-
-`claims` App Endpoints
-----------------------
+claims App Endpoints
+------------------------
 
 ``/``
-^^^^^
+
 
 * **View:** ``ClaimListView``
 * **URL Name:** ``claims:claim-list``
@@ -28,7 +24,7 @@ Reference for all the URL endpoints available in the application.
     * If the ``_partial=rows`` parameter is present (for infinite scroll), it returns only the next set of table rows (``claims/partials/_claim_rows.html``).
 
 ``/claim/<int:claim_id>/``
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 * **View:** ``ClaimDetailView``
 * **URL Name:** ``claims:claim-detail``
@@ -39,7 +35,7 @@ Reference for all the URL endpoints available in the application.
 * **HTMX Interaction:** This endpoint is designed to be called via an HTMX ``GET`` request. It returns an HTML partial (``claims/partials/_claim_detail.html``) that is intended to be displayed on the main page without a full reload.
 
 ``/claim/<int:claim_id>/toggle-flag/``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 * **View:** ``ToggleFlagView``
 * **URL Name:** ``claims:toggle-flag``
@@ -50,7 +46,7 @@ Reference for all the URL endpoints available in the application.
 * **HTMX Interaction:** Called via an HTMX ``POST`` request. It returns an HTML partial of the updated flag button (``claims/partials/_flag_button.html``) and triggers a custom HTMX event (``refresh-claim-detail-<claim_id>``) to signal other components to refresh.
 
 ``/claim/<int:claim_id>/add-note/``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 * **View:** ``AddNoteView``
 * **URL Name:** ``claims:add-note``
@@ -64,10 +60,10 @@ Reference for all the URL endpoints available in the application.
 ---------------------------
 
 Project-Level Endpoints
------------------------
+---------------------------
 
 ``/admin/``
-^^^^^^^^^^^
+
 
 * **View:** Django Admin Site
 * **URL Name:** ``admin:*``
@@ -75,7 +71,7 @@ Project-Level Endpoints
 * **Description:** The built-in Django administration interface. Requires superuser privileges.
 
 ``/login/``
-^^^^^^^^^^^
+
 
 * **View:** ``django.contrib.auth.views.LoginView``
 * **URL Name:** ``login``
@@ -83,7 +79,7 @@ Project-Level Endpoints
 * **Description:** Renders the login form (on GET) and handles user authentication (on POST).
 
 ``/logout/``
-^^^^^^^^^^^^
+
 
 * **View:** ``django.contrib.auth.views.LogoutView``
 * **URL Name:** ``logout``

@@ -129,7 +129,7 @@ class ClaimDetailView(LoginRequiredMixin, DetailView):
     """
     Handles fetching and displaying the details for a single claim. This view
     is designed to be rendered within the main list view via an HTMX request,
-    avoiding a full page reload.
+    to avoid a full page reload.
     """
 
     model = Claim

@@ -6,16 +6,16 @@ Getting Started Guide
 These are steps required to set up the project, load the initial data, and run the test suite.
 
 Prerequisites
--------------
+-----------------
 
 * Python 3.13+
 * pip (Python package installer)
 * A virtual environment tool
 
 Project Setup
--------------
+-----------------
 
-1.  **Clone the Repository**
+1.  Clone the Repository
 
     First, clone the project repository to local machine.
 
@@ -23,9 +23,9 @@ Project Setup
 
         git clone https://github.com/zz-xx/ERISA-Recovery-Challenge.git
 
-2.  **Create and Activate a Virtual Environment**
+2.  Create and Activate a Virtual Environment
 
-    Navigate into the project's ``src`` directory and create a virtual environment. ``venv`` was used in development since it's bundled with python but ``virtualenv`` can also be used.
+    Create a virtual environment. ``venv`` was used in development since it's bundled with python but ``virtualenv`` can also be used.
 
     .. code-block:: bash
 
@@ -37,28 +37,37 @@ Project Setup
         python3 -m venv env
         source env/bin/activate
 
-3.  **Install Dependencies**
+3.  Install Dependencies
 
-    Install all the required Python packages from the ``requirements.txt`` file.
+    Make sure virtual environment is active. Then install all the required Python packages from the ``requirements.txt`` file.
 
     .. code-block:: bash
 
         pip install -r requirements.txt
 
 Database Setup and Data Loading
--------------------------------
+-----------------------------------
+0. Switch to project directory
 
-1.  **Run Database Migrations**
+    .. code-block:: bash
 
-    Before loading data, we need to create the database schema. The ``migrate`` command applies all the necessary database changes.
+        cd src
 
+1.  Run Database Migrations
+
+    Before loading data, we need to create the database schema.
+
+    .. code-block:: bash
+
+        python manage.py makemigrations claims
+    
     .. code-block:: bash
 
         python manage.py migrate
 
-2.  **Load the Initial Claim Data**
+2.  Load the Initial Claim Data
 
-    Use the custom ``load_claim_data`` command to populate the database from the provided CSV files. This command requires the paths to the claims and details files and an optional ``--delimiter``.
+    Use the custom ``load_claim_data`` command to populate the database from the CSV files. This command requires the paths to the claims and details files and an optional ``--delimiter``.
 
     .. note::
         The sample data files use a pipe (``|``) as a delimiter.
@@ -67,16 +76,16 @@ Database Setup and Data Loading
 
         python manage.py load_claim_data data/claim_list_data.csv data/claim_detail_data.csv --delimiter "|"
 
-3.  **Create a Superuser Account**
+3.  Create a Superuser Account
 
-    To log in to the application and the Django admin area, create a superuser account. Follow the prompts to set a username, email, and password.
+    To log in to the application and the Django admin dashboard, create a superuser account. Follow the prompts to set a username, email, and password.
 
     .. code-block:: bash
 
         python manage.py createsuperuser
 
 Running the Application
------------------------
+---------------------------
 
 Once the setup is complete, run the local development server:
 
@@ -87,11 +96,11 @@ Once the setup is complete, run the local development server:
 Access the application at `http://127.0.0.1:8000/`. Login with the username and password created in previous step.
 
 Running the Test Suite
-----------------------
+--------------------------
 
-To verify that everything is working correctly, run the automated test suite.
+Run the test suite.
 
-1.  **Run Basic Tests**
+1.  Run Basic Tests
 
     This command runs all tests within the ``claims`` app and provides detailed output.
 
@@ -99,9 +108,9 @@ To verify that everything is working correctly, run the automated test suite.
 
         python manage.py test claims --verbosity=2
 
-2.  **Check Test Coverage**
+2.  Check Test Coverage
 
-    To see which lines of code are covered by the tests, use the ``coverage`` package.
+    To see total test coverage, use the ``coverage`` package.
 
     .. code-block:: bash
 

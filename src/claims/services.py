@@ -55,8 +55,7 @@ class ClaimDataIngestor:
     def run(self) -> Tuple[LoadSummary, List[str]]:
         """
         Executes the full data loading process within a single database transaction.
-        If any part of the process fails, the transaction is rolled back, ensuring
-        data integrity.
+        If any part of the process fails, the transaction is rolled back.
 
         Returns:
             A tuple containing a summary dictionary of the load results and a

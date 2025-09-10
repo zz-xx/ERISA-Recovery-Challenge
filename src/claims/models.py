@@ -7,8 +7,7 @@ from django.utils import timezone
 
 class Claim(models.Model):
     """
-    Represents a single insurance claim, serving as the central record for all
-    related financial and status information.
+    Represents a single insurance claim.
     """
 
     class ClaimStatus(models.TextChoices):
@@ -68,8 +67,7 @@ class Claim(models.Model):
     @property
     def underpayment(self) -> Decimal:
         """
-        Calculates the difference between the billed and paid amounts,
-        representing the underpayment value.
+        Calculates the difference between the billed and paid amounts and get the underpayment value.
         """
         return self.billed_amount - self.paid_amount
 
@@ -101,8 +99,7 @@ class ClaimDetail(models.Model):
 
 class Note(models.Model):
     """
-    Stores user-generated annotations or notes for a specific claim,
-    allowing for collaboration and record-keeping.
+    Stores user-generated annotations or notes for a specific claim.
     """
 
     claim = models.ForeignKey(Claim, on_delete=models.CASCADE, related_name="notes")

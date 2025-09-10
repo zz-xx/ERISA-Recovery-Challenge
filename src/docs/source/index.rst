@@ -16,5 +16,7 @@ documentation for details.
    :caption: Contents:
 
    getting_started
+   how_it_works
    url_endpoints
+   template_reference
    claims_app
