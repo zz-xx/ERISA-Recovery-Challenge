@@ -10,15 +10,13 @@ Reference for all the URL endpoints available in the application.
 `claims` App Endpoints
 ----------------------
 
-These URLs are defined in ``claims/urls.py`` and handle the core functionality of the application.
-
 ``/``
-^^^
+^^^^^
 
 * **View:** ``ClaimListView``
 * **URL Name:** ``claims:claim-list``
 * **Method:** ``GET``
-* **Description:** This is the main dashboard of the application. It renders the full initial HTML page, including the main claims table.
+* **Description:** It renders the main claims table.
 * **Query Parameters (Optional):**
     * ``search=<query>``: Filters the list to claims where the patient or insurer name contains the query string.
     * ``status=<STATUS>``: Filters the list to claims with a specific status (e.g., ``PAID``, ``DENIED``).
@@ -67,8 +65,6 @@ These URLs are defined in ``claims/urls.py`` and handle the core functionality o
 
 Project-Level Endpoints
 -----------------------
-
-These URLs are defined in ``erisa_project/urls.py`` and handle site-wide functionality like authentication and administration.
 
 ``/admin/``
 ^^^^^^^^^^^

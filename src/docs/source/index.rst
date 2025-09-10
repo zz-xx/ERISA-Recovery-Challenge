@@ -16,6 +16,5 @@ documentation for details.
    :caption: Contents:
 
    getting_started
-   design_philosophy
    url_endpoints
    claims_app
