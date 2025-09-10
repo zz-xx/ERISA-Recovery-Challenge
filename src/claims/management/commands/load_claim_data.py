@@ -1,5 +1,7 @@
 from pathlib import Path
-from django.core.management.base import BaseCommand, CommandError, CommandParser
+
+from django.core.management.base import (BaseCommand, CommandError, CommandParser)
+
 from claims.services import ClaimDataIngestor
 
 
@@ -45,7 +47,7 @@ class Command(BaseCommand):
             )
         )
 
-        # Pass the delimiter to the ingestor 
+        # Pass the delimiter to the ingestor
         ingestor = ClaimDataIngestor(
             claims_csv_path, details_csv_path, delimiter=delimiter
         )

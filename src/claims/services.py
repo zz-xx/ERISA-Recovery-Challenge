@@ -1,11 +1,10 @@
 import csv
-from datetime import datetime
 from decimal import Decimal, InvalidOperation
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
+from typing import Dict, Tuple, List, Union, Any
 
 from django.db import transaction
-
 from .models import Claim, ClaimDetail
 
 # A type alias for our summary dictionary
@@ -15,6 +14,8 @@ LoadSummary = Dict[str, int]
 class ClaimDataIngestor:
     """
     A service class to handle the ingestion of claim data from CSV files.
+    This class encapsulates the logic for parsing, validating, and saving
+    claim and claim detail data to the database.
     """
 
     def __init__(
@@ -23,7 +24,14 @@ class ClaimDataIngestor:
         details_csv_path: Union[Path, str],
         delimiter: str = ",",
     ):
-        # to ensure paths are always Path objects for consistency
+        """
+        Initializes the ingestor with paths to the data files.
+
+        Args:
+            claims_csv_path: The file path for the main claims data.
+            details_csv_path: The file path for the claim details data.
+            delimiter: The character used to separate values in the CSV files.
+        """
         self.claims_csv_path = Path(claims_csv_path)
         self.details_csv_path = Path(details_csv_path)
         self.delimiter = delimiter
@@ -34,14 +42,19 @@ class ClaimDataIngestor:
         self.errors: List[str] = []
 
     def _log_error(self, row_num: int, file_name: str, error_msg: str) -> None:
-        """Logs an error encountered during processing."""
+        """Helper method to format and store an error message."""
         self.errors.append(f"Error in {file_name} at row {row_num}: {error_msg}")
 
     @transaction.atomic
     def run(self) -> Tuple[LoadSummary, List[str]]:
         """
-        Executes the data loading process within a database transaction.
-        Returns a summary dictionary and a list of errors.
+        Executes the full data loading process within a single database transaction.
+        If any part of the process fails, the transaction is rolled back, ensuring
+        data integrity.
+
+        Returns:
+            A tuple containing a summary dictionary of the load results and a
+            list of any errors encountered.
         """
         self._load_claims()
         self._load_claim_details()
@@ -54,6 +67,32 @@ class ClaimDataIngestor:
         }
         return summary, self.errors
 
+    def _parse_claim_row(self, row: Dict[str, str]) -> Dict[str, Any]:
+        """Parses and validates a single row from the claims CSV file."""
+        claim_id = int(row["id"])
+        billed_amount = Decimal(row["billed_amount"])
+        paid_amount = Decimal(row["paid_amount"])
+        discharge_date = datetime.strptime(row["discharge_date"], "%Y-%m-%d").date()
+
+        return {
+            "id": claim_id,
+            "patient_name": row["patient_name"],
+            "billed_amount": billed_amount,
+            "paid_amount": paid_amount,
+            "status": row["status"].upper(),
+            "insurer_name": row["insurer_name"],
+            "discharge_date": discharge_date,
+        }
+
+    def _update_or_create_claim(self, claim_data: Dict[str, Any]) -> None:
+        """Updates or creates a Claim instance from parsed data."""
+        claim_id = claim_data.pop("id")
+        _, created = Claim.objects.update_or_create(id=claim_id, defaults=claim_data)
+        if created:
+            self.claims_created += 1
+        else:
+            self.claims_updated += 1
+
     def _load_claims(self) -> None:
         """Loads the main claim records from the provided CSV file."""
         print("Processing the main claims file...")
@@ -62,28 +101,8 @@ class ClaimDataIngestor:
                 reader = csv.DictReader(f, delimiter=self.delimiter)
                 for i, row in enumerate(reader, start=2):
                     try:
-                        claim_id = int(row["id"])
-                        billed_amount = Decimal(row["billed_amount"])
-                        paid_amount = Decimal(row["paid_amount"])
-                        discharge_date = datetime.strptime(
-                            row["discharge_date"], "%Y-%m-%d"
-                        ).date()
-
-                        defaults = {
-                            "patient_name": row["patient_name"],
-                            "billed_amount": billed_amount,
-                            "paid_amount": paid_amount,
-                            "status": row["status"].upper(),
-                            "insurer_name": row["insurer_name"],
-                            "discharge_date": discharge_date,
-                        }
-                        _, created = Claim.objects.update_or_create(
-                            id=claim_id, defaults=defaults
-                        )
-                        if created:
-                            self.claims_created += 1
-                        else:
-                            self.claims_updated += 1
+                        claim_data = self._parse_claim_row(row)
+                        self._update_or_create_claim(claim_data)
                     except (ValueError, InvalidOperation, KeyError) as e:
                         self._log_error(i, self.claims_csv_path.name, str(e))
         except FileNotFoundError:

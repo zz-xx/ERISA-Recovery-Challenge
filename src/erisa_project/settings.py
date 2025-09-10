@@ -38,9 +38,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django.contrib.humanize", #for readable numbers
+    "django.contrib.humanize",  # for readable numbers
     "claims",
-    "django_htmx"
+    "django_htmx",
 ]
 
 MIDDLEWARE = [
@@ -51,7 +51,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django_htmx.middleware.HtmxMiddleware"
+    "django_htmx.middleware.HtmxMiddleware",
 ]
 
 ROOT_URLCONF = "erisa_project.urls"
@@ -60,7 +60,7 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         # # add template dir
-        "DIRS": [os.path.join(BASE_DIR, 'templates')],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -105,7 +105,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, "static"),
 ]
 
 # Internationalization
@@ -130,6 +130,6 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/login/'
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/login/"
