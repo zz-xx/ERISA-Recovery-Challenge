@@ -1,47 +1,36 @@
 # ERISA-Recovery-Challenge
 
-## Instructions
+**My submission for [Erisa Recovery Challenge 2025](https://www.erisachallenge.dev/).**
 
-### load data into database
+## Documentation and Setup
 
-```bash 
-python manage.py makemigrations claims
-```
+Please visit the project Github Pages [here](https://zz-xx.github.io/ERISA-Recovery-Challenge/).
 
-```bash
-python manage.py migrate
-```
+## Live Version
 
-```bash
-python manage.py load_claim_data data/claim_list_data.csv data/claim_detail_data.csv --delimiter "|"
-```
+A live version hosted on PythonAnywhere can be found [here](https://yashr.pythonanywhere.com/).
 
+## Brief Challenge Requirements
 
-create user credentials for viewing data. unfortunately no user registration for now.
+Build a lightweight web application that mimics how insurance claims are analyzed at ERISA Recovery.
 
-```bash
-python manage.py createsuperuser
-```
+### Mandated Tech Stack
 
+- Backend - Django
+ - Database - SQLite
+- Frontend - HTML/CSS + HTMX
+- Client-Side - Alpine.js
 
-### run tests
+### Core Requirements
 
-```bash
-python manage.py test claims --verbosity=2
-```
+ - Data Ingestion into database from CSV/JSON claim records.
 
-```bash
-coverage run manage.py test claims
-```
+ - Claims List View to display all claims with ID, patient name, billed amount, paid amount, status, and insurer name
 
-terminal report
+ - HTMX Detail View to show claim-specific information without full page reload.
 
-```bash
-coverage report -m
-```
+ - Allow users to flag claims for review and add custom notes stored in database.
 
-Detailed HTML Report (Recommended)
+ - Search & Filter functionality for for claim status or insurer name.
 
-```bash
-coverage html
-```
+Please visit documentation for more details including implementation of bonus features.
