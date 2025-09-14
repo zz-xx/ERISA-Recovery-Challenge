@@ -31,7 +31,13 @@
                 </svg>
             </button>
 
-            {% include 'claims/partials/_flag_button.html' %}
+            <span id="flag-button-{{ claim.id }}"
+                  hx-get="{% url 'claims:flag-button' claim.id %}"
+                  hx-trigger="refresh-claim-detail-{{ claim.id }} from:body"
+                  hx-target="this"
+                  hx-swap="innerHTML">
+                {% include 'claims/partials/_flag_button.html' %}
+            </span>
 
         </div>
     </td>

@@ -201,3 +201,14 @@ class AddNoteView(LoginRequiredMixin, View):
         # Return the updated notes list, ordered by most recent first.
         notes = claim.notes.all().order_by("-created_at")
         return render(request, "claims/partials/_notes_section.html", {"notes": notes})
+
+
+class FlagButtonView(LoginRequiredMixin, View):
+    """
+    Returns the current flag button partial for a claim without mutating state.
+    Used to refresh the flag icon in the list row when the flag is toggled elsewhere.
+    """
+
+    def get(self, request: HttpRequest, claim_id: int) -> HttpResponse:
+        claim = get_object_or_404(Claim, id=claim_id)
+        return render(request, "claims/partials/_flag_button.html", {"claim": claim})
