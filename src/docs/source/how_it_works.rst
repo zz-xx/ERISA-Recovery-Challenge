@@ -22,7 +22,7 @@ Typical User Session
 4.  Django's URL resolver matches this to the ``ClaimDetailView``.
 5.  The view fetches the specific details for Claim 101, including its notes.
 6.  It renders the ``_claim_detail.html`` partial without rendering a full page.
-7.  This small snippet of HTML is sent back to the browser. HTMX then takes this snippet and places it into the target ``div`` on the main page.
+7.  This small snippet of HTML is sent back to the browser. HTMX then takes this snippet and inserts it as a detail table row (a new ``<tr>``) immediately after the clicked row — no full page reload.
 
 **c. The User Flags the Claim**
 
@@ -37,9 +37,9 @@ Typical User Session
 **d. The User Searches for "Aetna"**
 
 1.  The user types "Aetna" into the search box and presses Enter.
-2.  The search input has HTMX attributes: ``hx-get="/"``, ``hx-target="#claims-table-body"``.
+2.  The search input has HTMX attributes: ``hx-get="/"``, ``hx-target="#claims-table-wrapper"``.
 3.  HTMX sends a ``GET`` request to the root URL, but this time it includes the search query: ``/?search=Aetna``.
 4.  This request goes back to the **same** ``ClaimListView`` as the initial page load.
 5.  However, the view detects the ``search`` parameter in the URL. Its ``get_queryset`` method adds a ``.filter()`` clause to the database query, fetching only the claims matching "Aetna".
 6.  The view also detects that this is an HTMX request, so it renders the ``_claims_table.html`` partial, not the full page.
-7.  HTMX receives this updated table body and replaces the entire content of the ``<tbody>`` on the page to show only the search results.
+7.  HTMX receives the updated table and replaces the content of the wrapper (``#claims-table-wrapper``) to show only the search results.

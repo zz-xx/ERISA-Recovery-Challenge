@@ -113,6 +113,14 @@ Once the setup is complete, run the local development server:
 
 Access the application at `http://127.0.0.1:8000/`. Login with the username and password created in previous step.
 
+Authentication
+-----------------
+
+The main dashboard view (``ClaimListView``) requires authentication. Unauthenticated users are redirected to the login page (``/login/``). You can either:
+
+* Log in using the superuser created above, or
+* Visit ``/register/`` to create a basic account, then log in.
+
 Running the Test Suite
 --------------------------
 
@@ -125,6 +133,35 @@ Run the test suite.
     .. code-block:: bash
 
         python manage.py test claims --verbosity=2
+
+CSV File Schemas
+--------------------
+
+Claims CSV (required columns):
+
+.. code-block:: text
+
+    id,patient_name,billed_amount,paid_amount,status,insurer_name,discharge_date
+    101,Jane Smith,1200.50,1000.00,PAID,Acme Insurance,2025-09-01
+
+Claim Details CSV (required columns):
+
+.. code-block:: text
+
+    id,claim_id,cpt_codes,denial_reason
+    1,101,"99214,99215","Prior authorization required"
+
+Notes
+-----
+
+* Status values are normalized to upper-case and must be one of ``PAID``, ``DENIED``, or ``UNDER REVIEW``.
+* The ``cpt_codes`` field expects a comma-separated list of codes. The UI renders each code as a tag.
+* In overwrite mode, deleting Claims cascades to related ClaimDetail and Note records.
+
+Logs
+----
+
+Application logs are written to ``logs/app.log`` with rotation (see Django ``LOGGING`` settings). This can be helpful when running data ingestion to review summaries and any row-level errors.
 
 2.  Check Test Coverage
 

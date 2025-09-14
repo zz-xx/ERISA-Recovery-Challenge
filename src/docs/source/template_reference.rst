@@ -3,7 +3,7 @@
 Frontend: Template Reference
 ============================
 
-This 
+Reference for the templates and HTMX partials used by the UI.
 
 Core Layout
 ---------------
@@ -13,10 +13,11 @@ Core Layout
 
 * **Purpose:** This is the main site-wide layout template. All other full-page templates extend from it.
 * **Features:**
-    * Includes the Pico CSS .
+    * Includes Pico CSS (Slate) via CDN.
     * Defines the main navigation bar, including the user's name and a logout button.
     * Contains a main content block (``{% block content %}``) that child templates populate.
     * Manages the light/dark theme toggle functionality using Alpine.js.
+    * Injects the CSRF token into all non-GET HTMX requests for security.
 
 Authentication
 ------------------
@@ -42,7 +43,7 @@ Claims Application Templates
 * **Key Sections:**
     * **Filter Form:** A form with inputs for searching, filtering by status, and showing flagged claims. These controls use HTMX attributes (``hx-get``, ``hx-trigger``, ``hx-target``) to reload the claims table without a full page refresh.
     * **Claims Table:** The main table structure. The actual content of the table is included from a partial template (``_claims_table.html``).
-    * **Claim Detail Section:** A dedicated ``div`` that acts as a target for loading claim details via HTMX.
+    * **Claim Detail Rendering:** Clicking a claim row loads a detail ``<tr>`` after that row via HTMX (not a separate ``div`` container).
 
 HTMX Partials
 -----------------

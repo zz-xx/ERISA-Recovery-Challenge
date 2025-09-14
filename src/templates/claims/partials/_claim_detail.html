@@ -55,7 +55,7 @@
                     <div class="grid">
                         <div class="cpt-codes-container">
                             <label>CPT Codes</label>
-                            {% for code in claim.details.cpt_codes|split %}
+                            {% for code in claim.details.cpt_codes|split:',' %}
                             <span class="cpt-code-tag">{{ code }}</span>
                             {% endfor %}
                         </div>

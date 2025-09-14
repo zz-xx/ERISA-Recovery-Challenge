@@ -17,10 +17,10 @@ claims App Endpoints
     * ``search=<query>``: Filters the list to claims where the patient or insurer name contains the query string.
     * ``status=<STATUS>``: Filters the list to claims with a specific status (e.g., ``PAID``, ``DENIED``).
     * ``flagged=true``: Filters the list to show only claims that are flagged for review.
-    * ``sort=<field>``: Sorts the list by the specified field. Prepending a hyphen (``-``) reverses the order (e.g., ``-billed_amount`` for descending).
+    * ``sort=<field>``: Sorts the list by the specified field. Prepending a hyphen (``-``) reverses the order (e.g., ``-billed_amount`` for descending). Allowed fields: ``id``, ``patient_name``, ``billed_amount``, ``paid_amount``, ``status``, ``insurer_name``, ``discharge_date``.
     * ``page=<number>``: Returns the specified page of results. The view is configured to show 50 claims per page.
 * **HTMX Interaction:** When called with HTMX, this endpoint returns HTML partials instead of a full page:
-    * If for sorting or filtering, it returns the content of the table body (``claims/partials/_claims_table.html``).
+    * If for sorting or filtering, it returns the updated table wrapper content (``claims/partials/_claims_table.html``) intended for ``#claims-table-wrapper``.
     * If the ``_partial=rows`` parameter is present (for infinite scroll), it returns only the next set of table rows (``claims/partials/_claim_rows.html``).
 
 ``/claim/<int:claim_id>/``
@@ -44,6 +44,15 @@ claims App Endpoints
 * **URL Parameters:**
     * ``claim_id`` (integer): The ID of the ``Claim`` to flag or unflag.
 * **HTMX Interaction:** Called via an HTMX ``POST`` request. It returns an HTML partial of the updated flag button (``claims/partials/_flag_button.html``) and triggers a custom HTMX event (``refresh-claim-detail-<claim_id>``) to signal other components to refresh.
+
+``/claim/<int:claim_id>/flag-button/``
+
+
+* **View:** ``FlagButtonView``
+* **URL Name:** ``claims:flag-button``
+* **Method:** ``GET``
+* **Description:** Returns the current flag button partial for the given claim without changing state. Used to refresh the list-row flag icon when a flag is toggled elsewhere.
+* **HTMX Interaction:** Typically listens for ``refresh-claim-detail-<claim_id>`` and swaps the button HTML in-place.
 
 ``/claim/<int:claim_id>/add-note/``
 
@@ -85,3 +94,11 @@ Project-Level Endpoints
 * **URL Name:** ``logout``
 * **Method:** ``GET`` or ``POST``
 * **Description:** Logs out the currently authenticated user and redirects them to the login page.
+
+``/register/``
+
+
+* **View:** ``claims.views.RegisterView``
+* **URL Name:** ``register``
+* **Methods:** ``GET``, ``POST``
+* **Description:** Renders a simple registration form and creates an account on POST. On success, redirects to the login page.
