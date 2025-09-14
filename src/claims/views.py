@@ -6,7 +6,10 @@ from django.db.models import Q, QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
-from django.views.generic import DetailView, ListView, View
+from django.views.generic import DetailView, ListView, View, FormView
+from django.urls import reverse_lazy
+from django.contrib import messages
+from .forms import RegistrationForm
 
 from .models import Claim, Note
 
@@ -212,3 +215,16 @@ class FlagButtonView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, claim_id: int) -> HttpResponse:
         claim = get_object_or_404(Claim, id=claim_id)
         return render(request, "claims/partials/_flag_button.html", {"claim": claim})
+
+
+class RegisterView(FormView):
+    """Allow users to create an account and then log in."""
+
+    template_name = "registration/register.html"
+    form_class = RegistrationForm
+    success_url = reverse_lazy("login")
+
+    def form_valid(self, form) -> HttpResponse:
+        form.save()
+        messages.success(self.request, "Account created! You can now log in.")
+        return super().form_valid(form)

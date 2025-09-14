@@ -213,3 +213,24 @@ class ClaimsViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.claim1.notes.count(), 1)
         
+class RegistrationFlowTests(TestCase):
+    def test_register_with_weak_password_and_login(self):
+        # GET register page
+        resp = self.client.get(reverse('register'))
+        self.assertEqual(resp.status_code, 200)
+
+        # POST weak password
+        data = {
+            'username': 'weakuser',
+            'password1': '123',
+            'password2': '123',
+        }
+        resp = self.client.post(reverse('register'), data)
+        # should redirect to login
+        self.assertEqual(resp.status_code, 302)
+        self.assertEqual(resp.url, reverse('login'))
+
+        # User exists and can login
+        self.assertTrue(User.objects.filter(username='weakuser').exists())
+        login_ok = self.client.login(username='weakuser', password='123')
+        self.assertTrue(login_ok)
