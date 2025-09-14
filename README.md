@@ -22,7 +22,7 @@ Build a lightweight web application that mimics how insurance claims are analyze
 - Client-Side - Alpine.js
 - UI - Pico CSS (Slate)
 
-### Core Requirements
+### Required Core Features
 
  - Data Ingestion into database from CSV/JSON claim records.
 
@@ -34,26 +34,23 @@ Build a lightweight web application that mimics how insurance claims are analyze
 
  - Search & Filter functionality for for claim status or insurer name.
 
-Please visit documentation for more details including implementation of bonus features.
+### Implemented Requirements
 
-## Implementation
+- **CSV ingestion**: Management command `python manage.py load_claim_data <claims_csv> <details_csv> --delimiter <char>` loads claims + claim details, with sample CSVs in `src/data`.
+- **Claims list view**: Paginated (50/page) table showing ID, patient, billed, paid, status, insurer, with server-side sorting and filters.
+- **HTMX detail view**: Clicking a row loads a claim detail `<tr>` after the row (partial) without full page reload.
+- **Flag + notes**: Toggle “Flag for Review” (tracks `flagged_by`/`flagged_at`) and add per-claim notes; both updated via HTMX partial swaps.
+- **Search & filter**: Search on patient or insurer; filter by status; filter flagged-only.
 
-### Core Requirements Implemented
+### Implemented Bonus / Extra Features
 
-- CSV ingestion: Management command `python manage.py load_claim_data <claims_csv> <details_csv> --delimiter <char> [--mode append|overwrite]` loads claims + claim details, with sample CSVs in `src/data`. Overwrite mode purges existing claims (cascades details/notes). JSON ingestion is not implemented.
-- Claims list view: Paginated (50/page) table showing ID, patient, billed, paid, status, insurer, with server-side sorting and filters.
-- HTMX detail view: Clicking a row loads a claim detail `<tr>` after the row (partial) without full page reload.
-- Flag + notes: Toggle “Flag for Review” (tracks `flagged_by`/`flagged_at`) and add per-claim notes; both update via HTMX partial swaps.
-- Search & filter: Search on patient or insurer; filter by status; filter flagged-only.
+- **Authentication**: Login/Logout plus a simple Register flow (`/register/`).
+- **CSV Ingestion (append/overwrite)**: `python manage.py load_claim_data <claims_csv> <details_csv> --delimiter <char> [--mode append|overwrite]` Overwrite mode purges existing claims. Append mode adds to existing records, skipping duplicate claim IDs. 
+- **Sorting UX**: Clickable header links for ascending/descending order with inline arrow indicators (custom tags `sort_url` and `sort_indicator`).
+- **Infinite scroll**: Appends additional rows via HTMX when scrolled to the bottom.
+- **Theming**: Light/Dark theme toggle using Alpine.js.
+- **Logging**: Rotating file logs at `logs/app.log`.
+- **Admin**: Django admin configured for Claims, ClaimDetails, and Notes.
+- **Sphinx Docs**:  Sphinx docs (autodoc + viewcode) with GitHub Pages published.
 
-### Bonus / Extra Features Implemented
-
-- Authentication: Login/Logout plus a simple Register flow (`/register/`), then redirect to login.
-- Sorting UX: Clickable header links with ascending/descending toggle and inline arrow indicators (custom tags `sort_url` and `sort_indicator`).
-- Infinite scroll: Appends additional rows via HTMX when scrolled to the bottom.
-- Theming: Light/Dark theme toggle using Alpine.js.
-- UI: Pico CSS (Slate) for a clean, responsive interface.
-- Logging: Rotating file logs at `logs/app.log` for ingestion summaries and app events.
-- Admin: Django admin configured for Claims, ClaimDetails, and Notes.
-- CSRF + HTMX: Base template injects CSRF header on non-GET HTMX requests.
-- Docs: Sphinx docs (autodoc + viewcode) with GitHub Pages published.
+Please visit documentation for more info including implementation details.
