@@ -1,0 +1,4 @@
+id|patient_name|billed_amount|paid_amount|status|insurer_name|discharge_date
+1001|Alex Johnson|1200.00|800.00|PAID|Acme Health|2024-08-15
+1002|Jamie Smith|750.50|0.00|DENIED|PrimeCare|2024-07-30
+1003|Taylor Lee|3000.00|2500.00|UNDER REVIEW|Shield Insurance|2024-09-01

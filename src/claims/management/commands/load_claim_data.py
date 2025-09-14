@@ -32,22 +32,36 @@ class Command(BaseCommand):
             default=",",
             help="The delimiter character used in the CSV files. Defaults to a comma (,).",
         )
+        parser.add_argument(
+            "--mode",
+            type=str,
+            choices=("overwrite", "append"),
+            default="append",
+            help=(
+                "Data load mode: 'overwrite' clears existing Claim data then loads new rows; "
+                "'append' only creates new rows and leaves existing ones unchanged. "
+                "Defaults to 'append'."
+            ),
+        )
 
     def handle(self, *args, **options) -> None:
         """The main execution logic for the command."""
         claims_csv_path: Path = options["claims_csv"]
         details_csv_path: Path = options["details_csv"]
         delimiter: str = options["delimiter"]
+        mode: str = options["mode"]
 
         if not claims_csv_path.exists():
             raise CommandError(f"File not found at: {claims_csv_path}")
         if not details_csv_path.exists():
             raise CommandError(f"File not found at: {details_csv_path}")
 
-        logger.info(f"Starting data ingestion with '{delimiter}' as the delimiter...")
+        logger.info(
+            f"Starting data ingestion with delimiter='{delimiter}', mode='{mode}'..."
+        )
 
         ingestor = ClaimDataIngestor(
-            claims_csv_path, details_csv_path, delimiter=delimiter
+            claims_csv_path, details_csv_path, delimiter=delimiter, mode=mode
         )
 
         try:

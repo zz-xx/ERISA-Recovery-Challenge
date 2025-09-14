@@ -5,7 +5,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
 
-from django.db import transaction
+from django.db import transaction, IntegrityError
 
 from .models import Claim, ClaimDetail
 
@@ -27,6 +27,7 @@ class ClaimDataIngestor:
         claims_csv_path: Union[Path, str],
         details_csv_path: Union[Path, str],
         delimiter: str = ",",
+        mode: str = "append",
     ):
         """
         Initializes the ingestor with paths to the data files.
@@ -39,10 +40,13 @@ class ClaimDataIngestor:
         self.claims_csv_path = Path(claims_csv_path)
         self.details_csv_path = Path(details_csv_path)
         self.delimiter = delimiter
+        self.mode = mode  # 'append' (default) or 'overwrite'
         self.claims_created = 0
         self.claims_updated = 0
+        self.claims_skipped = 0
         self.details_created = 0
         self.details_updated = 0
+        self.details_skipped = 0
         self.errors: List[str] = []
 
     def _log_error(self, row_num: int, file_name: str, error_msg: str) -> None:
@@ -61,16 +65,27 @@ class ClaimDataIngestor:
             A tuple containing a summary dictionary of the load results and a
             list of any errors encountered.
         """
+        if self.mode == "overwrite":
+            self._purge_existing_data()
+
         self._load_claims()
         self._load_claim_details()
 
         summary: LoadSummary = {
             "claims_created": self.claims_created,
             "claims_updated": self.claims_updated,
+            "claims_skipped": self.claims_skipped,
             "details_created": self.details_created,
             "details_updated": self.details_updated,
+            "details_skipped": self.details_skipped,
         }
         return summary, self.errors
+
+    def _purge_existing_data(self) -> None:
+        """Deletes all existing claim-related data prior to overwrite reload."""
+        logger.info("Overwrite mode: purging existing Claim data (cascade deletes details/notes)...")
+        # Deleting Claims will cascade to ClaimDetail and Note via FK/OneToOne settings
+        Claim.objects.all().delete()
 
     def _parse_claim_row(self, row: Dict[str, str]) -> Dict[str, Any]:
         """Parses and validates a single row from the claims CSV file."""
@@ -89,14 +104,23 @@ class ClaimDataIngestor:
             "discharge_date": discharge_date,
         }
 
-    def _update_or_create_claim(self, claim_data: Dict[str, Any]) -> None:
-        """Updates or creates a Claim instance from parsed data."""
+    def _write_claim(self, claim_data: Dict[str, Any]) -> None:
+        """Create a Claim according to mode semantics."""
         claim_id = claim_data.pop("id")
-        _, created = Claim.objects.update_or_create(id=claim_id, defaults=claim_data)
-        if created:
+        if self.mode == "append":
+            if Claim.objects.filter(id=claim_id).exists():
+                self.claims_skipped += 1
+                return
+            Claim.objects.create(id=claim_id, **claim_data)
             self.claims_created += 1
-        else:
-            self.claims_updated += 1
+            return
+        # overwrite mode: table was purged; create fresh rows only
+        try:
+            Claim.objects.create(id=claim_id, **claim_data)
+            self.claims_created += 1
+        except IntegrityError as e:
+            # Duplicate IDs within the same CSV or DB state mismatch
+            self._log_error(0, self.claims_csv_path.name, f"Integrity error for claim {claim_id}: {e}")
 
     def _load_claims(self) -> None:
         """Loads the main claim records from the provided CSV file."""
@@ -107,7 +131,7 @@ class ClaimDataIngestor:
                 for i, row in enumerate(reader, start=2):
                     try:
                         claim_data = self._parse_claim_row(row)
-                        self._update_or_create_claim(claim_data)
+                        self._write_claim(claim_data)
                     except (ValueError, InvalidOperation, KeyError) as e:
                         self._log_error(i, self.claims_csv_path.name, str(e))
         except FileNotFoundError:
@@ -130,13 +154,23 @@ class ClaimDataIngestor:
                             "cpt_codes": row["cpt_codes"],
                             "denial_reason": row.get("denial_reason", ""),
                         }
-                        _, created = ClaimDetail.objects.update_or_create(
-                            claim=claim, defaults=defaults
-                        )
-                        if created:
-                            self.details_created += 1
+                        if self.mode == "append":
+                            if ClaimDetail.objects.filter(claim=claim).exists():
+                                self.details_skipped += 1
+                            else:
+                                ClaimDetail.objects.create(claim=claim, **defaults)
+                                self.details_created += 1
                         else:
-                            self.details_updated += 1
+                            # overwrite mode: table was purged by deleting Claims
+                            try:
+                                ClaimDetail.objects.create(claim=claim, **defaults)
+                                self.details_created += 1
+                            except IntegrityError as e:
+                                self._log_error(
+                                    i,
+                                    self.details_csv_path.name,
+                                    f"Integrity error for claim detail {claim.id}: {e}",
+                                )
                     except Claim.DoesNotExist:
                         self._log_error(
                             i,

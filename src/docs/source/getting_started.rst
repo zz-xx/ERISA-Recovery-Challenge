@@ -65,9 +65,9 @@ Database Setup and Data Loading
 
         python manage.py migrate
 
-2.  Load the Initial Claim Data
+2.  Load Claim Data
 
-    Use the custom ``load_claim_data`` command to populate the database from the CSV files. This command requires the paths to the claims and details files and an optional ``--delimiter``.
+    Use the custom ``load_claim_data`` command to populate the database from the CSV files. This command requires the paths to the claims and details files and supports ``--delimiter`` and ``--mode``.
 
     .. note::
         The sample data files use a pipe (``|``) as a delimiter.
@@ -75,6 +75,24 @@ Database Setup and Data Loading
     .. code-block:: bash
 
         python manage.py load_claim_data data/claim_list_data.csv data/claim_detail_data.csv --delimiter "|"
+
+        python manage.py load_claim_data data/claim_list_data.csv data/claim_detail_data.csv --delimiter "|" --mode overwrite
+
+    .. note::
+        - ``append`` (default) only creates missing records and skips existing ones. Skipped counts are reported in the summary.
+        - ``overwrite`` clears existing Claim data (cascades remove related details/notes), then inserts the rows from the CSVs.
+        - On Windows PowerShell, escape the pipe delimiter as ``"`|"`` instead of ``"|"``.
+
+    .. caution::
+        Using ``--mode overwrite`` deletes all existing Claim rows and cascades to related ClaimDetail and Note records. Back up annotations/flags if you need to preserve them.
+
+    Sample tiny CSVs for local testing are included at ``src/data/dummy`` using the ``|`` delimiter:
+
+    .. code-block:: bash
+
+        python manage.py load_claim_data data/dummy/dummy_claims.csv data/dummy/dummy_details.csv --delimiter "|"
+
+        python manage.py load_claim_data data/dummy/dummy_claims.csv data/dummy/dummy_details.csv --delimiter "|" --mode overwrite
 
 3.  Create a Superuser Account
 

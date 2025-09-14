@@ -19,9 +19,9 @@ class ClaimDataIngestorTests(TestCase):
         self.dummy_claims_path = "dummy_claims.csv"
         self.dummy_details_path = "dummy_details.csv"
 
-    def _run_ingestor_with_string_io(self, claims_csv_content: str, details_csv_content: str):
-        """Helper method to run the ingestor with in-memory CSV data."""
-        ingestor = ClaimDataIngestor(self.dummy_claims_path, self.dummy_details_path)
+    def _run_ingestor_with_string_io(self, claims_csv_content: str, details_csv_content: str, *, mode: str = "append"):
+        """Helper to run the ingestor with in-memory CSV data and a specific mode."""
+        ingestor = ClaimDataIngestor(self.dummy_claims_path, self.dummy_details_path, mode=mode)
 
         # The keys for the mock_files dictionary MUST be Path objects,
         # because the service now uses Path objects internally to call open().
@@ -60,8 +60,8 @@ class ClaimDataIngestorTests(TestCase):
         self.assertIsNotNone(claim.details)
         self.assertEqual(claim.details.cpt_codes, "99214,99215")
 
-    def test_update_existing_data(self):
-        """Tests that re-running the import updates existing records instead of creating duplicates."""
+    def test_overwrite_replaces_existing_data(self):
+        """Re-running with overwrite should replace existing data (purge then load)."""
         claim_id = 1
         initial_claims_csv = (
             "id,patient_name,billed_amount,paid_amount,status,insurer_name,discharge_date\n"
@@ -78,14 +78,33 @@ class ClaimDataIngestorTests(TestCase):
             f"{claim_id},Jane Smith,500.00,500.00,PAID,CIGMA,2025-08-15"
         )
 
-        summary, errors = self._run_ingestor_with_string_io(updated_claims_csv, initial_details_csv)
+        summary, errors = self._run_ingestor_with_string_io(updated_claims_csv, initial_details_csv, mode="overwrite")
 
         self.assertEqual(len(errors), 0)
-        self.assertEqual(summary["claims_updated"], 1)
-        self.assertEqual(summary["claims_created"], 0)
+        self.assertEqual(summary["claims_updated"], 0)
+        self.assertEqual(summary["claims_created"], 1)
         self.assertEqual(Claim.objects.count(), 1)
         self.assertEqual(Claim.objects.get(id=claim_id).status, "PAID")
         self.assertEqual(Claim.objects.get(id=claim_id).paid_amount, Decimal("500.00"))
+
+    def test_append_skips_existing_data(self):
+        """Append mode should not modify existing records; it skips duplicates."""
+        claim_id = 2
+        claims_csv = (
+            "id,patient_name,billed_amount,paid_amount,status,insurer_name,discharge_date\n"
+            f"{claim_id},Alpha,100.00,0.00,DENIED,Ins,2025-08-01"
+        )
+        details_csv = "id,claim_id,cpt_codes,denial_reason\n"
+
+        # initial load creates one
+        summary, errors = self._run_ingestor_with_string_io(claims_csv, details_csv, mode="append")
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(summary["claims_created"], 1)
+
+        # re-load same record in append mode: should skip
+        summary2, errors2 = self._run_ingestor_with_string_io(claims_csv, details_csv, mode="append")
+        self.assertEqual(len(errors2), 0)
+        self.assertEqual(summary2.get("claims_skipped", 0), 1)
 
     def test_handles_bad_data_gracefully(self):
         """Tests that rows with errors are skipped and reported."""

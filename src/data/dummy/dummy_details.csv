@@ -1,0 +1,4 @@
+id|claim_id|denial_reason|cpt_codes
+5001|1001||99213,80050
+5002|1002|Missing pre-authorization|G0299,97012
+5003|1003||99214
