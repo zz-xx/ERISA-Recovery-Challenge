@@ -126,7 +126,8 @@ Running the Test Suite
 
 Run the test suite.
 
-1.  Run Basic Tests
+Run Basic Tests
+^^^^^^^^^^^^^^^
 
     This command runs all tests within the ``claims`` app and provides detailed output.
 
@@ -134,38 +135,11 @@ Run the test suite.
 
         python manage.py test claims --verbosity=2
 
-CSV File Schemas
---------------------
+Check Test Coverage
+^^^^^^^^^^^^^^^^^^^
 
-Claims CSV (required columns):
-
-.. code-block:: text
-
-    id,patient_name,billed_amount,paid_amount,status,insurer_name,discharge_date
-    101,Jane Smith,1200.50,1000.00,PAID,Acme Insurance,2025-09-01
-
-Claim Details CSV (required columns):
-
-.. code-block:: text
-
-    id,claim_id,cpt_codes,denial_reason
-    1,101,"99214,99215","Prior authorization required"
-
-Notes
------
-
-* Status values are normalized to upper-case and must be one of ``PAID``, ``DENIED``, or ``UNDER REVIEW``.
-* The ``cpt_codes`` field expects a comma-separated list of codes. The UI renders each code as a tag.
-* In overwrite mode, deleting Claims cascades to related ClaimDetail and Note records.
-
-Logs
-----
-
-Application logs are written to ``logs/app.log`` with rotation (see Django ``LOGGING`` settings). This can be helpful when running data ingestion to review summaries and any row-level errors.
-
-2.  Check Test Coverage
-
-    To see total test coverage, use the ``coverage`` package.
+    Click to see the total `test coverage. <htmlcov/index.html>`_
+    To calculate total test coverage locally, use the ``coverage`` package.
 
     .. code-block:: bash
 
@@ -179,3 +153,33 @@ Application logs are written to ``logs/app.log`` with rotation (see Django ``LOG
         coverage html
 
     The HTML report ``index.html`` will be available in the ``src/htmlcov`` directory.
+
+Logs
+----
+
+Application logs are written to ``logs/app.log`` with rotation (see Django ``LOGGING`` settings). This can be helpful when running data ingestion to review summaries and any row-level errors.
+
+
+CSV File Schemas
+--------------------
+
+Claims CSV:
+
+.. code-block:: text
+
+    id,patient_name,billed_amount,paid_amount,status,insurer_name,discharge_date
+    101,Jane Smith,1200.50,1000.00,PAID,Acme Insurance,2025-09-01
+
+Claim Details CSV:
+
+.. code-block:: text
+
+    id,claim_id,cpt_codes,denial_reason
+    1,101,"99214,99215","Prior authorization required"
+
+Notes
+^^^^^
+
+* Status values are normalized to upper-case and must be one of ``PAID``, ``DENIED``, or ``UNDER REVIEW``.
+* The ``cpt_codes`` field expects a comma-separated list of codes. The UI renders each code as a tag.
+* In overwrite mode, deleting Claims cascades to related ClaimDetail and Note records.
