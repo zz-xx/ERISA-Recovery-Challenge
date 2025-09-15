@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>ERISA Recovery Challenge :: Backend: The claims App</title>
+  
+
+  <link rel="icon" type="image/png" sizes="32x32" href="_static/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="_static/img/favicon-16x16.png">
+  <link rel="index" title="Index" href="genindex.html"/>
+
+  <link rel="stylesheet" href="_static/css/insegel.css"/>
+  <link rel="stylesheet" href="_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/sphinx_highlight.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="insegel-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>ERISA Recovery Challenge</h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+    </header>
+
+    <div id="content-container">
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <section id="backend-the-claims-app">
+<span id="claims-app"></span><h1>Backend: The <cite>claims</cite> App<a class="headerlink" href="#backend-the-claims-app" title="Link to this heading">¶</a></h1>
+<section id="module-claims.views">
+<span id="views"></span><h2>Views<a class="headerlink" href="#module-claims.views" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="claims.views.AddNoteView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">claims.views.</span></span><span class="sig-name descname"><span class="pre">AddNoteView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/claims/views.html#AddNoteView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.views.AddNoteView" title="Link to this definition">¶</a></dt>
+<dd><p>Handles POST requests to add a new note to a claim.
+Returns an HTML partial of the updated notes section.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="claims.views.ClaimDetailView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">claims.views.</span></span><span class="sig-name descname"><span class="pre">ClaimDetailView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/claims/views.html#ClaimDetailView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.views.ClaimDetailView" title="Link to this definition">¶</a></dt>
+<dd><p>Handles fetching and displaying the details for a single claim. This view
+is designed to be rendered within the main list view via an HTMX request,
+to avoid a full page reload.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="claims.views.ClaimDetailView.get_context_data">
+<span class="sig-name descname"><span class="pre">get_context_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/claims/views.html#ClaimDetailView.get_context_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.views.ClaimDetailView.get_context_data" title="Link to this definition">¶</a></dt>
+<dd><p>Adds the claim’s notes to the context, ordered by most recent first.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="claims.views.ClaimDetailView.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#claims.views.ClaimDetailView.model" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#claims.models.Claim" title="claims.models.Claim"><code class="xref py py-class docutils literal notranslate"><span class="pre">Claim</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="claims.views.ClaimListView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">claims.views.</span></span><span class="sig-name descname"><span class="pre">ClaimListView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/claims/views.html#ClaimListView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.views.ClaimListView" title="Link to this definition">¶</a></dt>
+<dd><p>Displays a list of all claims in the Claims Dashboard.</p>
+<p>This view supports:
+- Searching by insurer name and patient name.
+- Filtering by claim status and flagged status.
+- Sorting on multiple fields.
+- HTMX-powered partial updates for filtering, sorting, and infinite scroll.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="claims.views.ClaimListView.get_context_data">
+<span class="sig-name descname"><span class="pre">get_context_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/claims/views.html#ClaimListView.get_context_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.views.ClaimListView.get_context_data" title="Link to this definition">¶</a></dt>
+<dd><p>Adds filter and sorting values to the context for use in the template.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="claims.views.ClaimListView.get_queryset">
+<span class="sig-name descname"><span class="pre">get_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QuerySet</span></span></span><a class="reference internal" href="_modules/claims/views.html#ClaimListView.get_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.views.ClaimListView.get_queryset" title="Link to this definition">¶</a></dt>
+<dd><p>Overrides the default queryset to implement search, filter, and sorting logic.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="claims.views.ClaimListView.get_template_names">
+<span class="sig-name descname"><span class="pre">get_template_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/claims/views.html#ClaimListView.get_template_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.views.ClaimListView.get_template_names" title="Link to this definition">¶</a></dt>
+<dd><p>If the request is from HTMX, return the appropriate partial template.
+- For infinite scroll, return just the table rows.
+- For sorting/filtering, return the entire table body.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="claims.views.ClaimListView.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#claims.views.ClaimListView.model" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#claims.models.Claim" title="claims.models.Claim"><code class="xref py py-class docutils literal notranslate"><span class="pre">Claim</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="claims.views.FlagButtonView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">claims.views.</span></span><span class="sig-name descname"><span class="pre">FlagButtonView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/claims/views.html#FlagButtonView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.views.FlagButtonView" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the current flag button partial for a claim without mutating state.
+Used to refresh the flag icon in the list row when the flag is toggled elsewhere.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="claims.views.RegisterView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">claims.views.</span></span><span class="sig-name descname"><span class="pre">RegisterView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/claims/views.html#RegisterView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.views.RegisterView" title="Link to this definition">¶</a></dt>
+<dd><p>Allow users to create an account and then log in.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="claims.views.RegisterView.form_class">
+<span class="sig-name descname"><span class="pre">form_class</span></span><a class="headerlink" href="#claims.views.RegisterView.form_class" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">RegistrationForm</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="claims.views.RegisterView.form_valid">
+<span class="sig-name descname"><span class="pre">form_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">HttpResponse</span></span></span><a class="reference internal" href="_modules/claims/views.html#RegisterView.form_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.views.RegisterView.form_valid" title="Link to this definition">¶</a></dt>
+<dd><p>If the form is valid, redirect to the supplied URL.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="claims.views.ToggleFlagView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">claims.views.</span></span><span class="sig-name descname"><span class="pre">ToggleFlagView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/claims/views.html#ToggleFlagView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.views.ToggleFlagView" title="Link to this definition">¶</a></dt>
+<dd><p>Handles POST requests to toggle the ‘is_flagged’ status of a claim.
+This view returns an HTML partial of the updated flag button and triggers
+an HTMX event to refresh the claim detail view if it’s open.</p>
+</dd></dl>
+
+</section>
+<section id="module-claims.models">
+<span id="models"></span><h2>Models<a class="headerlink" href="#module-claims.models" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="claims.models.Claim">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">claims.models.</span></span><span class="sig-name descname"><span class="pre">Claim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/claims/models.html#Claim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.models.Claim" title="Link to this definition">¶</a></dt>
+<dd><p>Represents a single insurance claim.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="claims.models.Claim.ClaimStatus">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ClaimStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/claims/models.html#Claim.ClaimStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.models.Claim.ClaimStatus" title="Link to this definition">¶</a></dt>
+<dd><p>Defines the possible statuses for a claim.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="claims.models.Claim.DoesNotExist">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#claims.models.Claim.DoesNotExist" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="claims.models.Claim.MultipleObjectsReturned">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#claims.models.Claim.MultipleObjectsReturned" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="claims.models.Claim.underpayment">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">underpayment</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Decimal</span></em><a class="headerlink" href="#claims.models.Claim.underpayment" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the difference between the billed and paid amounts and get the underpayment value.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="claims.models.ClaimDetail">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">claims.models.</span></span><span class="sig-name descname"><span class="pre">ClaimDetail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/claims/models.html#ClaimDetail"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.models.ClaimDetail" title="Link to this definition">¶</a></dt>
+<dd><p>Provides specific, detailed information related to a single claim,
+such as medical codes or denial reasons.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="claims.models.ClaimDetail.DoesNotExist">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#claims.models.ClaimDetail.DoesNotExist" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="claims.models.ClaimDetail.MultipleObjectsReturned">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#claims.models.ClaimDetail.MultipleObjectsReturned" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="claims.models.Note">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">claims.models.</span></span><span class="sig-name descname"><span class="pre">Note</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/claims/models.html#Note"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.models.Note" title="Link to this definition">¶</a></dt>
+<dd><p>Stores user-generated annotations or notes for a specific claim.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="claims.models.Note.DoesNotExist">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#claims.models.Note.DoesNotExist" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="claims.models.Note.MultipleObjectsReturned">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#claims.models.Note.MultipleObjectsReturned" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-claims.services">
+<span id="services"></span><h2>Services<a class="headerlink" href="#module-claims.services" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="claims.services.ClaimDataIngestor">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">claims.services.</span></span><span class="sig-name descname"><span class="pre">ClaimDataIngestor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">claims_csv_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details_csv_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">','</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'append'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/claims/services.html#ClaimDataIngestor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.services.ClaimDataIngestor" title="Link to this definition">¶</a></dt>
+<dd><p>A service class to handle the ingestion of claim data from CSV files.
+This class encapsulates the logic for parsing, validating, and saving
+claim and claim detail data to the database.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="claims.services.ClaimDataIngestor.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/claims/services.html#ClaimDataIngestor.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.services.ClaimDataIngestor.run" title="Link to this definition">¶</a></dt>
+<dd><p>Executes the full data loading process within a single database transaction.
+If any part of the process fails, the transaction is rolled back.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>A tuple containing a summary dictionary of the load results and a
+list of any errors encountered.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-claims.management.commands.load_claim_data">
+<span id="management-commands"></span><h2>Management Commands<a class="headerlink" href="#module-claims.management.commands.load_claim_data" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="claims.management.commands.load_claim_data.Command">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">claims.management.commands.load_claim_data.</span></span><span class="sig-name descname"><span class="pre">Command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stdout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stderr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/claims/management/commands/load_claim_data.html#Command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.management.commands.load_claim_data.Command" title="Link to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="claims.management.commands.load_claim_data.Command.add_arguments">
+<span class="sig-name descname"><span class="pre">add_arguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CommandParser</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/claims/management/commands/load_claim_data.html#Command.add_arguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.management.commands.load_claim_data.Command.add_arguments" title="Link to this definition">¶</a></dt>
+<dd><p>Add the command line arguments for the CSV file paths.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="claims.management.commands.load_claim_data.Command.handle">
+<span class="sig-name descname"><span class="pre">handle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/claims/management/commands/load_claim_data.html#Command.handle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.management.commands.load_claim_data.Command.handle" title="Link to this definition">¶</a></dt>
+<dd><p>The main execution logic for the command.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-claims.templatetags.claim_tags">
+<span id="template-tags"></span><h2>Template Tags<a class="headerlink" href="#module-claims.templatetags.claim_tags" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="claims.templatetags.claim_tags.sort_indicator">
+<span class="sig-prename descclassname"><span class="pre">claims.templatetags.claim_tags.</span></span><span class="sig-name descname"><span class="pre">sort_indicator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/claims/templatetags/claim_tags.html#sort_indicator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.templatetags.claim_tags.sort_indicator" title="Link to this definition">¶</a></dt>
+<dd><p>Returns an HTML SVG arrow to indicate the current sort field and direction.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>context: The template context, which must contain the <cite>request</cite> object.
+field_name: The name of the model field for the indicator.</p>
+</dd>
+<dt>Returns:</dt><dd><p>An HTML string for an SVG arrow if the field is being sorted,
+otherwise an empty string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="claims.templatetags.claim_tags.sort_url">
+<span class="sig-prename descclassname"><span class="pre">claims.templatetags.claim_tags.</span></span><span class="sig-name descname"><span class="pre">sort_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/claims/templatetags/claim_tags.html#sort_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.templatetags.claim_tags.sort_url" title="Link to this definition">¶</a></dt>
+<dd><p>Generates a URL for a table header to handle sorting.</p>
+<p>It preserves all existing filter/search query parameters and toggles
+the sort direction for the given field.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>context: The template context, which must contain the <cite>request</cite> object.
+field_name: The name of the model field to sort by.</p>
+</dd>
+<dt>Returns:</dt><dd><p>A URL-encoded string for the href attribute of a link.
+e.g., “?search=acme&amp;status=PAID&amp;sort=-billed_amount”</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="claims.templatetags.claim_tags.split">
+<span class="sig-prename descclassname"><span class="pre">claims.templatetags.claim_tags.</span></span><span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/claims/templatetags/claim_tags.html#split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#claims.templatetags.claim_tags.split" title="Link to this definition">¶</a></dt>
+<dd><p>A simple template filter that splits a string into a list of strings.</p>
+<p>Usage: {{ some_string|split:”,” }}</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+        </div>
+      </div>
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+            <input type="text" name="q" placeholder="Search..." />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#project-setup">Project Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#database-setup-and-data-loading">Database Setup and Data Loading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#running-the-application">Running the Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#authentication">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#running-the-test-suite">Running the Test Suite</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#run-basic-tests">Run Basic Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#check-test-coverage">Check Test Coverage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#logs">Logs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#csv-file-schemas">CSV File Schemas</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#notes">Notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="how_it_works.html">How the Application Works</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="how_it_works.html#typical-user-session">Typical User Session</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="url_endpoints.html">URL Endpoint Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="url_endpoints.html#claims-app-endpoints">claims App Endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="url_endpoints.html#project-level-endpoints">Project-Level Endpoints</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="template_reference.html">Frontend: Template Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="template_reference.html#core-layout">Core Layout</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#base-html"><code class="docutils literal notranslate"><span class="pre">base.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="template_reference.html#authentication">Authentication</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#registration-login-html"><code class="docutils literal notranslate"><span class="pre">registration/login.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="template_reference.html#claims-application-templates">Claims Application Templates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-claim-list-html"><code class="docutils literal notranslate"><span class="pre">claims/claim_list.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="template_reference.html#htmx-partials">HTMX Partials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-partials-claims-table-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claims_table.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-partials-claim-rows-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claim_rows.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-partials-claim-detail-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claim_detail.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-partials-notes-section-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_notes_section.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-partials-flag-button-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_flag_button.html</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Backend: The <cite>claims</cite> App</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-claims.views">Views</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#claims.views.AddNoteView"><code class="docutils literal notranslate"><span class="pre">AddNoteView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#claims.views.ClaimDetailView"><code class="docutils literal notranslate"><span class="pre">ClaimDetailView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#claims.views.ClaimListView"><code class="docutils literal notranslate"><span class="pre">ClaimListView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#claims.views.FlagButtonView"><code class="docutils literal notranslate"><span class="pre">FlagButtonView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#claims.views.RegisterView"><code class="docutils literal notranslate"><span class="pre">RegisterView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#claims.views.ToggleFlagView"><code class="docutils literal notranslate"><span class="pre">ToggleFlagView</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-claims.models">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#claims.models.Claim"><code class="docutils literal notranslate"><span class="pre">Claim</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#claims.models.ClaimDetail"><code class="docutils literal notranslate"><span class="pre">ClaimDetail</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#claims.models.Note"><code class="docutils literal notranslate"><span class="pre">Note</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-claims.services">Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#claims.services.ClaimDataIngestor"><code class="docutils literal notranslate"><span class="pre">ClaimDataIngestor</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-claims.management.commands.load_claim_data">Management Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#claims.management.commands.load_claim_data.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-claims.templatetags.claim_tags">Template Tags</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#claims.templatetags.claim_tags.sort_indicator"><code class="docutils literal notranslate"><span class="pre">sort_indicator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#claims.templatetags.claim_tags.sort_url"><code class="docutils literal notranslate"><span class="pre">sort_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#claims.templatetags.claim_tags.split"><code class="docutils literal notranslate"><span class="pre">split()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  
+
+
+        </div>
+
+        
+
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="_sources/claims_app.rst.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2025, yashr
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/Autophagy/insegel">Insegel</a>
+
+        </div>
+    </div>
+
+    <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+    <script type="text/javascript">
+      $("#menu-toggle").click(function() {
+        $("#menu-toggle").toggleClass("toggled");
+        $("#side-menu-container").slideToggle(300);
+      });
+    </script>
+
+</footer> 
+
+</div>
+
+</body>
+</html>

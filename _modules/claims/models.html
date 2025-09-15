@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>ERISA Recovery Challenge :: claims.models</title>
+  
+
+  <link rel="icon" type="image/png" sizes="32x32" href="../../_static/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../_static/img/favicon-16x16.png">
+  <link rel="index" title="Index" href="../../genindex.html"/>
+
+  <link rel="stylesheet" href="../../_static/css/insegel.css"/>
+  <link rel="stylesheet" href="../../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/sphinx_highlight.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="insegel-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>ERISA Recovery Challenge</h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+    </header>
+
+    <div id="content-container">
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <h1>Source code for claims.models</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">decimal</span><span class="w"> </span><span class="kn">import</span> <span class="n">Decimal</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+
+
+<div class="viewcode-block" id="Claim">
+<a class="viewcode-back" href="../../claims_app.html#claims.views.Claim">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Claim</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a single insurance claim.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Claim.ClaimStatus">
+<a class="viewcode-back" href="../../claims_app.html#claims.views.Claim.ClaimStatus">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">ClaimStatus</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">TextChoices</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Defines the possible statuses for a claim.&quot;&quot;&quot;</span>
+
+        <span class="n">PAID</span> <span class="o">=</span> <span class="s2">&quot;PAID&quot;</span><span class="p">,</span> <span class="s2">&quot;Paid&quot;</span>
+        <span class="n">DENIED</span> <span class="o">=</span> <span class="s2">&quot;DENIED&quot;</span><span class="p">,</span> <span class="s2">&quot;Denied&quot;</span>
+        <span class="n">UNDER_REVIEW</span> <span class="o">=</span> <span class="s2">&quot;UNDER REVIEW&quot;</span><span class="p">,</span> <span class="s2">&quot;Under Review&quot;</span></div>
+
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">editable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">patient_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;Full name of the patient.&quot;</span>
+    <span class="p">)</span>
+    <span class="n">billed_amount</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DecimalField</span><span class="p">(</span>
+        <span class="n">max_digits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">decimal_places</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;The amount originally billed to the insurer.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">paid_amount</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DecimalField</span><span class="p">(</span>
+        <span class="n">max_digits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">decimal_places</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;The amount paid by the insurer.&quot;</span>
+    <span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">ClaimStatus</span><span class="o">.</span><span class="n">choices</span><span class="p">,</span>
+        <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;The current processing status of the claim.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">insurer_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;The name of the insurance company.&quot;</span>
+    <span class="p">)</span>
+    <span class="n">discharge_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateField</span><span class="p">()</span>
+    <span class="n">is_flagged</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;Mark this claim for special review or follow-up.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Auditing fields for tracking who flagged a claim and when.</span>
+    <span class="n">flagged_by</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+        <span class="n">User</span><span class="p">,</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">SET_NULL</span><span class="p">,</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;flagged_claims&quot;</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;The user who flagged this claim.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">flagged_at</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;The timestamp when the claim was flagged.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Timestamps for record creation and updates.</span>
+    <span class="n">created_at</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">updated_at</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;String representation of the Claim model.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Claim </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">patient_name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">underpayment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Decimal</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the difference between the billed and paid amounts and get the underpayment value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">billed_amount</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">paid_amount</span></div>
+
+
+
+<div class="viewcode-block" id="ClaimDetail">
+<a class="viewcode-back" href="../../claims_app.html#claims.views.ClaimDetail">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ClaimDetail</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provides specific, detailed information related to a single claim,</span>
+<span class="sd">    such as medical codes or denial reasons.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># A OneToOneField ensures that a claim can only have one detail record.</span>
+    <span class="n">claim</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">OneToOneField</span><span class="p">(</span>
+        <span class="n">Claim</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;details&quot;</span>
+    <span class="p">)</span>
+    <span class="n">cpt_codes</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;Comma-separated CPT (Current Procedural Terminology) codes.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">denial_reason</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;The reason provided by the insurer for denying the claim.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;String representation of the ClaimDetail model.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Details for Claim </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">claim</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="Note">
+<a class="viewcode-back" href="../../claims_app.html#claims.views.Note">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Note</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores user-generated annotations or notes for a specific claim.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">claim</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Claim</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span>
+    <span class="n">note</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;The content of the note.&quot;</span><span class="p">)</span>
+    <span class="n">created_at</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+        <span class="n">User</span><span class="p">,</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">SET_NULL</span><span class="p">,</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;The user who created this note.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides a truncated preview of the note for display in the admin</span>
+<span class="sd">        or other contexts.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">note_preview</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">[:</span><span class="mi">75</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">75</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">note</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Note on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">claim</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">note_preview</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+</pre></div>
+
+        </div>
+      </div>
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+            <input type="text" name="q" placeholder="Search..." />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#project-setup">Project Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#database-setup-and-data-loading">Database Setup and Data Loading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#running-the-application">Running the Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#authentication">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#running-the-test-suite">Running the Test Suite</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started.html#run-basic-tests">Run Basic Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started.html#check-test-coverage">Check Test Coverage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#logs">Logs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#csv-file-schemas">CSV File Schemas</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started.html#notes">Notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../how_it_works.html">How the Application Works</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../how_it_works.html#typical-user-session">Typical User Session</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../url_endpoints.html">URL Endpoint Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../url_endpoints.html#claims-app-endpoints">claims App Endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../url_endpoints.html#project-level-endpoints">Project-Level Endpoints</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../template_reference.html">Frontend: Template Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../template_reference.html#core-layout">Core Layout</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#base-html"><code class="docutils literal notranslate"><span class="pre">base.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../template_reference.html#authentication">Authentication</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#registration-login-html"><code class="docutils literal notranslate"><span class="pre">registration/login.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../template_reference.html#claims-application-templates">Claims Application Templates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#claims-claim-list-html"><code class="docutils literal notranslate"><span class="pre">claims/claim_list.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../template_reference.html#htmx-partials">HTMX Partials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#claims-partials-claims-table-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claims_table.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#claims-partials-claim-rows-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claim_rows.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#claims-partials-claim-detail-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claim_detail.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#claims-partials-notes-section-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_notes_section.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#claims-partials-flag-button-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_flag_button.html</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../claims_app.html">Backend: The <cite>claims</cite> App</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../claims_app.html#module-claims.views">Views</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.views.AddNoteView"><code class="docutils literal notranslate"><span class="pre">AddNoteView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.views.ClaimDetailView"><code class="docutils literal notranslate"><span class="pre">ClaimDetailView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.views.ClaimListView"><code class="docutils literal notranslate"><span class="pre">ClaimListView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.views.FlagButtonView"><code class="docutils literal notranslate"><span class="pre">FlagButtonView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.views.RegisterView"><code class="docutils literal notranslate"><span class="pre">RegisterView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.views.ToggleFlagView"><code class="docutils literal notranslate"><span class="pre">ToggleFlagView</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../claims_app.html#module-claims.models">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.models.Claim"><code class="docutils literal notranslate"><span class="pre">Claim</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.models.ClaimDetail"><code class="docutils literal notranslate"><span class="pre">ClaimDetail</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.models.Note"><code class="docutils literal notranslate"><span class="pre">Note</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../claims_app.html#module-claims.services">Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.services.ClaimDataIngestor"><code class="docutils literal notranslate"><span class="pre">ClaimDataIngestor</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../claims_app.html#module-claims.management.commands.load_claim_data">Management Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.management.commands.load_claim_data.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../claims_app.html#module-claims.templatetags.claim_tags">Template Tags</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.templatetags.claim_tags.sort_indicator"><code class="docutils literal notranslate"><span class="pre">sort_indicator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.templatetags.claim_tags.sort_url"><code class="docutils literal notranslate"><span class="pre">sort_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.templatetags.claim_tags.split"><code class="docutils literal notranslate"><span class="pre">split()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  
+
+
+        </div>
+
+        
+
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2025, yashr
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/Autophagy/insegel">Insegel</a>
+
+        </div>
+    </div>
+
+    <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+    <script type="text/javascript">
+      $("#menu-toggle").click(function() {
+        $("#menu-toggle").toggleClass("toggled");
+        $("#side-menu-container").slideToggle(300);
+      });
+    </script>
+
+</footer> 
+
+</div>
+
+</body>
+</html>

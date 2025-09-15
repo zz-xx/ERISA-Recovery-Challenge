@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>ERISA Recovery Challenge :: claims.views</title>
+  
+
+  <link rel="icon" type="image/png" sizes="32x32" href="../../_static/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../_static/img/favicon-16x16.png">
+  <link rel="index" title="Index" href="../../genindex.html"/>
+
+  <link rel="stylesheet" href="../../_static/css/insegel.css"/>
+  <link rel="stylesheet" href="../../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/sphinx_highlight.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="insegel-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>ERISA Recovery Challenge</h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+    </header>
+
+    <div id="content-container">
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <h1>Source code for claims.views</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.mixins</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoginRequiredMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Q</span><span class="p">,</span> <span class="n">QuerySet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpRequest</span><span class="p">,</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_object_or_404</span><span class="p">,</span> <span class="n">render</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetailView</span><span class="p">,</span> <span class="n">ListView</span><span class="p">,</span> <span class="n">View</span><span class="p">,</span> <span class="n">FormView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse_lazy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">messages</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegistrationForm</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Claim</span><span class="p">,</span> <span class="n">Note</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ClaimListView">
+<a class="viewcode-back" href="../../claims_app.html#claims.views.ClaimListView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ClaimListView</span><span class="p">(</span><span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">ListView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Displays a list of all claims in the Claims Dashboard.</span>
+
+<span class="sd">    This view supports:</span>
+<span class="sd">    - Searching by insurer name and patient name.</span>
+<span class="sd">    - Filtering by claim status and flagged status.</span>
+<span class="sd">    - Sorting on multiple fields.</span>
+<span class="sd">    - HTMX-powered partial updates for filtering, sorting, and infinite scroll.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Claim</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;claims/claim_list.html&quot;</span>
+    <span class="n">context_object_name</span> <span class="o">=</span> <span class="s2">&quot;claims&quot;</span>
+    <span class="n">paginate_by</span> <span class="o">=</span> <span class="mi">50</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_search_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queryset</span><span class="p">:</span> <span class="n">QuerySet</span><span class="p">,</span> <span class="n">search_query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies a search filter to the queryset based on patient or insurer name.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">search_query</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">Q</span><span class="p">(</span><span class="n">patient_name__icontains</span><span class="o">=</span><span class="n">search_query</span><span class="p">)</span>
+                <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">insurer_name__icontains</span><span class="o">=</span><span class="n">search_query</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">queryset</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_status_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queryset</span><span class="p">:</span> <span class="n">QuerySet</span><span class="p">,</span> <span class="n">status_filter</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies a filter for a specific claim status.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">status_filter</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">status_filter</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">queryset</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_flagged_filter</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">queryset</span><span class="p">:</span> <span class="n">QuerySet</span><span class="p">,</span> <span class="n">flagged_filter</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies a filter to show only flagged claims.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">flagged_filter</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_flagged</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">queryset</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_sorting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queryset</span><span class="p">:</span> <span class="n">QuerySet</span><span class="p">,</span> <span class="n">sort_by</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies sorting to the queryset based on the provided field.&quot;&quot;&quot;</span>
+        <span class="n">allowed_sort_fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;patient_name&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;billed_amount&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;paid_amount&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;insurer_name&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;discharge_date&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="c1"># Fallback to a default sort order if the requested field is not allowed.</span>
+        <span class="n">sort_field</span> <span class="o">=</span> <span class="n">sort_by</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sort_field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_sort_fields</span><span class="p">:</span>
+            <span class="n">sort_by</span> <span class="o">=</span> <span class="s2">&quot;-discharge_date&quot;</span>
+        <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">sort_by</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ClaimListView.get_queryset">
+<a class="viewcode-back" href="../../claims_app.html#claims.views.ClaimListView.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuerySet</span><span class="p">[</span><span class="n">Claim</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overrides the default queryset to implement search, filter, and sorting logic.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s2">&quot;details&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get search/filter parameters from the request URL.</span>
+        <span class="n">search_query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;search&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">status_filter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">flagged_filter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;flagged&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">sort_by</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sort&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">)</span>  <span class="c1"># Default sort.</span>
+
+        <span class="c1"># Chain the filtering and sorting methods.</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_search_filter</span><span class="p">(</span><span class="n">queryset</span><span class="p">,</span> <span class="n">search_query</span><span class="p">)</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_status_filter</span><span class="p">(</span><span class="n">queryset</span><span class="p">,</span> <span class="n">status_filter</span><span class="p">)</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_flagged_filter</span><span class="p">(</span><span class="n">queryset</span><span class="p">,</span> <span class="n">flagged_filter</span><span class="p">)</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_sorting</span><span class="p">(</span><span class="n">queryset</span><span class="p">,</span> <span class="n">sort_by</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">queryset</span></div>
+
+
+<div class="viewcode-block" id="ClaimListView.get_context_data">
+<a class="viewcode-back" href="../../claims_app.html#claims.views.ClaimListView.get_context_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds filter and sorting values to the context for use in the template.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Pass the request object to the template for the custom template tags.</span>
+        <span class="n">context</span><span class="p">[</span><span class="s2">&quot;request&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span>
+
+        <span class="c1"># Provide current filter values to the template to repopulate controls.</span>
+        <span class="n">context</span><span class="p">[</span><span class="s2">&quot;claim_statuses&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Claim</span><span class="o">.</span><span class="n">ClaimStatus</span><span class="o">.</span><span class="n">choices</span>
+        <span class="n">context</span><span class="p">[</span><span class="s2">&quot;current_search&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;search&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s2">&quot;current_status&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s2">&quot;current_flagged&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;flagged&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Provide current sort values to the template.</span>
+        <span class="n">sort_param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sort&quot;</span><span class="p">,</span> <span class="s2">&quot;-discharge_date&quot;</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s2">&quot;current_sort_param&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sort_param</span>
+        <span class="n">context</span><span class="p">[</span><span class="s2">&quot;current_sort_field&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sort_param</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s2">&quot;current_sort_dir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;desc&quot;</span> <span class="k">if</span> <span class="n">sort_param</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;asc&quot;</span>
+
+        <span class="k">return</span> <span class="n">context</span></div>
+
+
+<div class="viewcode-block" id="ClaimListView.get_template_names">
+<a class="viewcode-back" href="../../claims_app.html#claims.views.ClaimListView.get_template_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_template_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If the request is from HTMX, return the appropriate partial template.</span>
+<span class="sd">        - For infinite scroll, return just the table rows.</span>
+<span class="sd">        - For sorting/filtering, return the entire table body.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">htmx</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_partial&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;rows&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;claims/partials/_claim_rows.html&quot;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;claims/partials/_claims_table.html&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">template_name</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ClaimDetailView">
+<a class="viewcode-back" href="../../claims_app.html#claims.views.ClaimDetailView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ClaimDetailView</span><span class="p">(</span><span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">DetailView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles fetching and displaying the details for a single claim. This view</span>
+<span class="sd">    is designed to be rendered within the main list view via an HTMX request,</span>
+<span class="sd">    to avoid a full page reload.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Claim</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;claims/partials/_claim_detail.html&quot;</span>
+    <span class="n">context_object_name</span> <span class="o">=</span> <span class="s2">&quot;claim&quot;</span>
+    <span class="n">pk_url_kwarg</span> <span class="o">=</span> <span class="s2">&quot;claim_id&quot;</span>
+
+<div class="viewcode-block" id="ClaimDetailView.get_context_data">
+<a class="viewcode-back" href="../../claims_app.html#claims.views.ClaimDetailView.get_context_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds the claim&#39;s notes to the context, ordered by most recent first.&quot;&quot;&quot;</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s2">&quot;notes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">notes</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-created_at&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ToggleFlagView">
+<a class="viewcode-back" href="../../claims_app.html#claims.views.ToggleFlagView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ToggleFlagView</span><span class="p">(</span><span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">View</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles POST requests to toggle the &#39;is_flagged&#39; status of a claim.</span>
+<span class="sd">    This view returns an HTML partial of the updated flag button and triggers</span>
+<span class="sd">    an HTMX event to refresh the claim detail view if it&#39;s open.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">,</span> <span class="n">claim_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponse</span><span class="p">:</span>
+        <span class="n">claim</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Claim</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">claim_id</span><span class="p">)</span>
+        <span class="n">claim</span><span class="o">.</span><span class="n">is_flagged</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">claim</span><span class="o">.</span><span class="n">is_flagged</span>
+
+        <span class="k">if</span> <span class="n">claim</span><span class="o">.</span><span class="n">is_flagged</span><span class="p">:</span>
+            <span class="n">claim</span><span class="o">.</span><span class="n">flagged_by</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+            <span class="n">claim</span><span class="o">.</span><span class="n">flagged_at</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">claim</span><span class="o">.</span><span class="n">flagged_by</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">claim</span><span class="o">.</span><span class="n">flagged_at</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">claim</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">update_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;is_flagged&quot;</span><span class="p">,</span> <span class="s2">&quot;flagged_by&quot;</span><span class="p">,</span> <span class="s2">&quot;flagged_at&quot;</span><span class="p">])</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;User &#39;</span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&#39; (ID: </span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">) &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;set is_flagged to </span><span class="si">{</span><span class="n">claim</span><span class="o">.</span><span class="n">is_flagged</span><span class="si">}</span><span class="s2"> for Claim ID </span><span class="si">{</span><span class="n">claim_id</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Render the button&#39;s HTML partial in response to the POST request.</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;claims/partials/_flag_button.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;claim&quot;</span><span class="p">:</span> <span class="n">claim</span><span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Add a special HTMX header to broadcast an event with the claim&#39;s ID.</span>
+        <span class="c1"># This allows other components on the page to react to the change.</span>
+        <span class="n">response</span><span class="p">[</span><span class="s2">&quot;HX-Trigger&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;refresh-claim-detail-</span><span class="si">{</span><span class="n">claim_id</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">response</span></div>
+
+
+
+<div class="viewcode-block" id="AddNoteView">
+<a class="viewcode-back" href="../../claims_app.html#claims.views.AddNoteView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AddNoteView</span><span class="p">(</span><span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">View</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles POST requests to add a new note to a claim.</span>
+<span class="sd">    Returns an HTML partial of the updated notes section.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">,</span> <span class="n">claim_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponse</span><span class="p">:</span>
+        <span class="n">claim</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Claim</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">claim_id</span><span class="p">)</span>
+        <span class="n">note_text</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;note&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">note_text</span><span class="p">:</span>
+            <span class="n">note</span> <span class="o">=</span> <span class="n">Note</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">claim</span><span class="o">=</span><span class="n">claim</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="n">note_text</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;User &#39;</span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&#39; (ID: </span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">) &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;added Note ID </span><span class="si">{</span><span class="n">note</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> to Claim ID </span><span class="si">{</span><span class="n">claim_id</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Return the updated notes list, ordered by most recent first.</span>
+        <span class="n">notes</span> <span class="o">=</span> <span class="n">claim</span><span class="o">.</span><span class="n">notes</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-created_at&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;claims/partials/_notes_section.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;notes&quot;</span><span class="p">:</span> <span class="n">notes</span><span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="FlagButtonView">
+<a class="viewcode-back" href="../../claims_app.html#claims.views.FlagButtonView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FlagButtonView</span><span class="p">(</span><span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">View</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the current flag button partial for a claim without mutating state.</span>
+<span class="sd">    Used to refresh the flag icon in the list row when the flag is toggled elsewhere.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">,</span> <span class="n">claim_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponse</span><span class="p">:</span>
+        <span class="n">claim</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Claim</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">claim_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;claims/partials/_flag_button.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;claim&quot;</span><span class="p">:</span> <span class="n">claim</span><span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="RegisterView">
+<a class="viewcode-back" href="../../claims_app.html#claims.views.RegisterView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RegisterView</span><span class="p">(</span><span class="n">FormView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow users to create an account and then log in.&quot;&quot;&quot;</span>
+
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;registration/register.html&quot;</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">RegistrationForm</span>
+    <span class="n">success_url</span> <span class="o">=</span> <span class="n">reverse_lazy</span><span class="p">(</span><span class="s2">&quot;login&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RegisterView.form_valid">
+<a class="viewcode-back" href="../../claims_app.html#claims.views.RegisterView.form_valid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponse</span><span class="p">:</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Account created! You can now log in.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+        </div>
+      </div>
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+            <input type="text" name="q" placeholder="Search..." />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#project-setup">Project Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#database-setup-and-data-loading">Database Setup and Data Loading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#running-the-application">Running the Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#authentication">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#running-the-test-suite">Running the Test Suite</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started.html#run-basic-tests">Run Basic Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started.html#check-test-coverage">Check Test Coverage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#logs">Logs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#csv-file-schemas">CSV File Schemas</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started.html#notes">Notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../how_it_works.html">How the Application Works</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../how_it_works.html#typical-user-session">Typical User Session</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../url_endpoints.html">URL Endpoint Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../url_endpoints.html#claims-app-endpoints">claims App Endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../url_endpoints.html#project-level-endpoints">Project-Level Endpoints</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../template_reference.html">Frontend: Template Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../template_reference.html#core-layout">Core Layout</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#base-html"><code class="docutils literal notranslate"><span class="pre">base.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../template_reference.html#authentication">Authentication</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#registration-login-html"><code class="docutils literal notranslate"><span class="pre">registration/login.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../template_reference.html#claims-application-templates">Claims Application Templates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#claims-claim-list-html"><code class="docutils literal notranslate"><span class="pre">claims/claim_list.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../template_reference.html#htmx-partials">HTMX Partials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#claims-partials-claims-table-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claims_table.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#claims-partials-claim-rows-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claim_rows.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#claims-partials-claim-detail-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claim_detail.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#claims-partials-notes-section-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_notes_section.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../template_reference.html#claims-partials-flag-button-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_flag_button.html</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../claims_app.html">Backend: The <cite>claims</cite> App</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../claims_app.html#module-claims.views">Views</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.views.AddNoteView"><code class="docutils literal notranslate"><span class="pre">AddNoteView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.views.ClaimDetailView"><code class="docutils literal notranslate"><span class="pre">ClaimDetailView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.views.ClaimListView"><code class="docutils literal notranslate"><span class="pre">ClaimListView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.views.FlagButtonView"><code class="docutils literal notranslate"><span class="pre">FlagButtonView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.views.RegisterView"><code class="docutils literal notranslate"><span class="pre">RegisterView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.views.ToggleFlagView"><code class="docutils literal notranslate"><span class="pre">ToggleFlagView</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../claims_app.html#module-claims.models">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.models.Claim"><code class="docutils literal notranslate"><span class="pre">Claim</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.models.ClaimDetail"><code class="docutils literal notranslate"><span class="pre">ClaimDetail</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.models.Note"><code class="docutils literal notranslate"><span class="pre">Note</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../claims_app.html#module-claims.services">Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.services.ClaimDataIngestor"><code class="docutils literal notranslate"><span class="pre">ClaimDataIngestor</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../claims_app.html#module-claims.management.commands.load_claim_data">Management Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.management.commands.load_claim_data.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../claims_app.html#module-claims.templatetags.claim_tags">Template Tags</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.templatetags.claim_tags.sort_indicator"><code class="docutils literal notranslate"><span class="pre">sort_indicator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.templatetags.claim_tags.sort_url"><code class="docutils literal notranslate"><span class="pre">sort_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../claims_app.html#claims.templatetags.claim_tags.split"><code class="docutils literal notranslate"><span class="pre">split()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  
+
+
+        </div>
+
+        
+
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2025, yashr
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/Autophagy/insegel">Insegel</a>
+
+        </div>
+    </div>
+
+    <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+    <script type="text/javascript">
+      $("#menu-toggle").click(function() {
+        $("#menu-toggle").toggleClass("toggled");
+        $("#side-menu-container").slideToggle(300);
+      });
+    </script>
+
+</footer> 
+
+</div>
+
+</body>
+</html>

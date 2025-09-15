@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>ERISA Recovery Challenge :: claims.templatetags.claim_tags</title>
+  
+
+  <link rel="icon" type="image/png" sizes="32x32" href="../../../_static/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../../_static/img/favicon-16x16.png">
+  <link rel="index" title="Index" href="../../../genindex.html"/>
+
+  <link rel="stylesheet" href="../../../_static/css/insegel.css"/>
+  <link rel="stylesheet" href="../../../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../../_static/sphinx_highlight.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="insegel-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>ERISA Recovery Challenge</h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+    </header>
+
+    <div id="content-container">
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <h1>Source code for claims.templatetags.claim_tags</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.safestring</span><span class="w"> </span><span class="kn">import</span> <span class="n">mark_safe</span>
+
+<span class="n">register</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">Library</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="sort_url">
+<a class="viewcode-back" href="../../../claims_app.html#claims.templatetags.claim_tags.sort_url">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span><span class="p">(</span><span class="n">takes_context</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sort_url</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a URL for a table header to handle sorting.</span>
+
+<span class="sd">    It preserves all existing filter/search query parameters and toggles</span>
+<span class="sd">    the sort direction for the given field.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        context: The template context, which must contain the `request` object.</span>
+<span class="sd">        field_name: The name of the model field to sort by.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A URL-encoded string for the href attribute of a link.</span>
+<span class="sd">        e.g., &quot;?search=acme&amp;status=PAID&amp;sort=-billed_amount&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">request</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;request&quot;</span><span class="p">]</span>
+    <span class="n">query_params</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">current_sort</span> <span class="o">=</span> <span class="n">query_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sort&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">current_sort</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">field_name</span><span class="p">:</span>
+        <span class="c1"># The current field is being sorted, so reverse the direction.</span>
+        <span class="k">if</span> <span class="n">current_sort</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">):</span>
+            <span class="n">query_params</span><span class="p">[</span><span class="s2">&quot;sort&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">field_name</span>  <span class="c1"># From descending to ascending.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">query_params</span><span class="p">[</span><span class="s2">&quot;sort&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;-</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">&quot;</span>  <span class="c1"># From ascending to descending.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># It&#39;s a new field, so default to ascending.</span>
+        <span class="n">query_params</span><span class="p">[</span><span class="s2">&quot;sort&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">field_name</span>
+
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;?</span><span class="si">{</span><span class="n">query_params</span><span class="o">.</span><span class="n">urlencode</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="sort_indicator">
+<a class="viewcode-back" href="../../../claims_app.html#claims.templatetags.claim_tags.sort_indicator">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span><span class="p">(</span><span class="n">takes_context</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sort_indicator</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns an HTML SVG arrow to indicate the current sort field and direction.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        context: The template context, which must contain the `request` object.</span>
+<span class="sd">        field_name: The name of the model field for the indicator.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        An HTML string for an SVG arrow if the field is being sorted,</span>
+<span class="sd">        otherwise an empty string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">request</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;request&quot;</span><span class="p">]</span>
+    <span class="n">current_sort</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sort&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">current_sort</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">field_name</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">current_sort</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">):</span>
+            <span class="c1"># Descending Arrow</span>
+            <span class="n">svg</span> <span class="o">=</span> <span class="s1">&#39;&lt;svg width=&quot;10&quot; height=&quot;10&quot; viewBox=&quot;0 0 24 24&quot; style=&quot;vertical-align: middle;&quot;&gt;&lt;path d=&quot;M12 21l12-18h-24z&quot;/&gt;&lt;/svg&gt;&#39;</span>
+            <span class="k">return</span> <span class="n">mark_safe</span><span class="p">(</span><span class="n">svg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Ascending Arrow</span>
+            <span class="n">svg</span> <span class="o">=</span> <span class="s1">&#39;&lt;svg width=&quot;10&quot; height=&quot;10&quot; viewBox=&quot;0 0 24 24&quot; style=&quot;vertical-align: middle;&quot;&gt;&lt;path d=&quot;M12 3l-12 18h24z&quot;/&gt;&lt;/svg&gt;&#39;</span>
+            <span class="k">return</span> <span class="n">mark_safe</span><span class="p">(</span><span class="n">svg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="split">
+<a class="viewcode-back" href="../../../claims_app.html#claims.templatetags.claim_tags.split">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;split&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">split</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple template filter that splits a string into a list of strings.</span>
+
+<span class="sd">    Usage: {{ some_string|split:&quot;,&quot; }}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+</pre></div>
+
+        </div>
+      </div>
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+            <input type="text" name="q" placeholder="Search..." />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#project-setup">Project Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#database-setup-and-data-loading">Database Setup and Data Loading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#running-the-application">Running the Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#authentication">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#running-the-test-suite">Running the Test Suite</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started.html#run-basic-tests">Run Basic Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started.html#check-test-coverage">Check Test Coverage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#logs">Logs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#csv-file-schemas">CSV File Schemas</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started.html#notes">Notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_it_works.html">How the Application Works</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../how_it_works.html#typical-user-session">Typical User Session</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../url_endpoints.html">URL Endpoint Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../url_endpoints.html#claims-app-endpoints">claims App Endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../url_endpoints.html#project-level-endpoints">Project-Level Endpoints</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../template_reference.html">Frontend: Template Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../template_reference.html#core-layout">Core Layout</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../template_reference.html#base-html"><code class="docutils literal notranslate"><span class="pre">base.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../template_reference.html#authentication">Authentication</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../template_reference.html#registration-login-html"><code class="docutils literal notranslate"><span class="pre">registration/login.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../template_reference.html#claims-application-templates">Claims Application Templates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../template_reference.html#claims-claim-list-html"><code class="docutils literal notranslate"><span class="pre">claims/claim_list.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../template_reference.html#htmx-partials">HTMX Partials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../template_reference.html#claims-partials-claims-table-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claims_table.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../template_reference.html#claims-partials-claim-rows-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claim_rows.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../template_reference.html#claims-partials-claim-detail-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claim_detail.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../template_reference.html#claims-partials-notes-section-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_notes_section.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../template_reference.html#claims-partials-flag-button-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_flag_button.html</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../claims_app.html">Backend: The <cite>claims</cite> App</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../claims_app.html#module-claims.views">Views</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../claims_app.html#claims.views.AddNoteView"><code class="docutils literal notranslate"><span class="pre">AddNoteView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../claims_app.html#claims.views.ClaimDetailView"><code class="docutils literal notranslate"><span class="pre">ClaimDetailView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../claims_app.html#claims.views.ClaimListView"><code class="docutils literal notranslate"><span class="pre">ClaimListView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../claims_app.html#claims.views.FlagButtonView"><code class="docutils literal notranslate"><span class="pre">FlagButtonView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../claims_app.html#claims.views.RegisterView"><code class="docutils literal notranslate"><span class="pre">RegisterView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../claims_app.html#claims.views.ToggleFlagView"><code class="docutils literal notranslate"><span class="pre">ToggleFlagView</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../claims_app.html#module-claims.models">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../claims_app.html#claims.models.Claim"><code class="docutils literal notranslate"><span class="pre">Claim</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../claims_app.html#claims.models.ClaimDetail"><code class="docutils literal notranslate"><span class="pre">ClaimDetail</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../claims_app.html#claims.models.Note"><code class="docutils literal notranslate"><span class="pre">Note</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../claims_app.html#module-claims.services">Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../claims_app.html#claims.services.ClaimDataIngestor"><code class="docutils literal notranslate"><span class="pre">ClaimDataIngestor</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../claims_app.html#module-claims.management.commands.load_claim_data">Management Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../claims_app.html#claims.management.commands.load_claim_data.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../claims_app.html#module-claims.templatetags.claim_tags">Template Tags</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../claims_app.html#claims.templatetags.claim_tags.sort_indicator"><code class="docutils literal notranslate"><span class="pre">sort_indicator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../claims_app.html#claims.templatetags.claim_tags.sort_url"><code class="docutils literal notranslate"><span class="pre">sort_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../claims_app.html#claims.templatetags.claim_tags.split"><code class="docutils literal notranslate"><span class="pre">split()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  
+
+
+        </div>
+
+        
+
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2025, yashr
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/Autophagy/insegel">Insegel</a>
+
+        </div>
+    </div>
+
+    <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+    <script type="text/javascript">
+      $("#menu-toggle").click(function() {
+        $("#menu-toggle").toggleClass("toggled");
+        $("#side-menu-container").slideToggle(300);
+      });
+    </script>
+
+</footer> 
+
+</div>
+
+</body>
+</html>

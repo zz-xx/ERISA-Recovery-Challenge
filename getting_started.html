@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>ERISA Recovery Challenge :: Getting Started Guide</title>
+  
+
+  <link rel="icon" type="image/png" sizes="32x32" href="_static/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="_static/img/favicon-16x16.png">
+  <link rel="index" title="Index" href="genindex.html"/>
+
+  <link rel="stylesheet" href="_static/css/insegel.css"/>
+  <link rel="stylesheet" href="_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/sphinx_highlight.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="insegel-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>ERISA Recovery Challenge</h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+    </header>
+
+    <div id="content-container">
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <section id="getting-started-guide">
+<span id="getting-started"></span><h1>Getting Started Guide<a class="headerlink" href="#getting-started-guide" title="Link to this heading">¶</a></h1>
+<p>These are steps required to set up the project, load the initial data, and run the test suite.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Python 3.13+</p></li>
+<li><p>pip (Python package installer)</p></li>
+<li><p>A virtual environment tool</p></li>
+</ul>
+</section>
+<section id="project-setup">
+<h2>Project Setup<a class="headerlink" href="#project-setup" title="Link to this heading">¶</a></h2>
+<ol class="arabic">
+<li><p>Clone the Repository</p>
+<p>First, clone the project repository to local machine.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/zz-xx/ERISA-Recovery-Challenge.git
+</pre></div>
+</div>
+</li>
+<li><p>Create and Activate a Virtual Environment</p>
+<p>Create a virtual environment. <code class="docutils literal notranslate"><span class="pre">venv</span></code> was used in development since it’s bundled with python but <code class="docutils literal notranslate"><span class="pre">virtualenv</span></code> can also be used.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># On Windows</span>
+python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>env
+.<span class="se">\\</span>env<span class="se">\\</span>Scripts<span class="se">\\</span>activate
+
+<span class="c1"># On macOS/Linux</span>
+python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>env
+<span class="nb">source</span><span class="w"> </span>env/bin/activate
+</pre></div>
+</div>
+</li>
+<li><p>Install Dependencies</p>
+<p>Make sure virtual environment is active. Then install all the required Python packages from the <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="database-setup-and-data-loading">
+<h2>Database Setup and Data Loading<a class="headerlink" href="#database-setup-and-data-loading" title="Link to this heading">¶</a></h2>
+<ol class="arabic" start="0">
+<li><p>Switch to project directory</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>src
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Run Database Migrations</p>
+<p>Before loading data, we need to create the database schema.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>manage.py<span class="w"> </span>makemigrations<span class="w"> </span>claims
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>manage.py<span class="w"> </span>migrate
+</pre></div>
+</div>
+</li>
+<li><p>Load Claim Data</p>
+<p>Use the custom <code class="docutils literal notranslate"><span class="pre">load_claim_data</span></code> command to populate the database from the CSV files. This command requires the paths to the claims and details files and supports <code class="docutils literal notranslate"><span class="pre">--delimiter</span></code> and <code class="docutils literal notranslate"><span class="pre">--mode</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The sample data files use a pipe (<code class="docutils literal notranslate"><span class="pre">|</span></code>) as a delimiter.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>manage.py<span class="w"> </span>load_claim_data<span class="w"> </span>data/claim_list_data.csv<span class="w"> </span>data/claim_detail_data.csv<span class="w"> </span>--delimiter<span class="w"> </span><span class="s2">&quot;|&quot;</span>
+
+python<span class="w"> </span>manage.py<span class="w"> </span>load_claim_data<span class="w"> </span>data/claim_list_data.csv<span class="w"> </span>data/claim_detail_data.csv<span class="w"> </span>--delimiter<span class="w"> </span><span class="s2">&quot;|&quot;</span><span class="w"> </span>--mode<span class="w"> </span>overwrite
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">append</span></code> (default) only creates missing records and skips existing ones. Skipped counts are reported in the summary.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">overwrite</span></code> clears existing Claim data (cascades remove related details/notes), then inserts the rows from the CSVs.</p></li>
+<li><p>On Windows PowerShell, escape the pipe delimiter as <code class="docutils literal notranslate"><span class="pre">&quot;`|&quot;</span></code> instead of <code class="docutils literal notranslate"><span class="pre">&quot;|&quot;</span></code>.</p></li>
+</ul>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>Using <code class="docutils literal notranslate"><span class="pre">--mode</span> <span class="pre">overwrite</span></code> deletes all existing Claim rows and cascades to related ClaimDetail and Note records. Back up annotations/flags if you need to preserve them.</p>
+</div>
+<p>Sample tiny CSVs for local testing are included at <code class="docutils literal notranslate"><span class="pre">src/data/dummy</span></code> using the <code class="docutils literal notranslate"><span class="pre">|</span></code> delimiter:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>manage.py<span class="w"> </span>load_claim_data<span class="w"> </span>data/dummy/dummy_claims.csv<span class="w"> </span>data/dummy/dummy_details.csv<span class="w"> </span>--delimiter<span class="w"> </span><span class="s2">&quot;|&quot;</span>
+
+python<span class="w"> </span>manage.py<span class="w"> </span>load_claim_data<span class="w"> </span>data/dummy/dummy_claims.csv<span class="w"> </span>data/dummy/dummy_details.csv<span class="w"> </span>--delimiter<span class="w"> </span><span class="s2">&quot;|&quot;</span><span class="w"> </span>--mode<span class="w"> </span>overwrite
+</pre></div>
+</div>
+</li>
+<li><p>Create a Superuser Account</p>
+<p>To log in to the application and the Django admin dashboard, create a superuser account. Follow the prompts to set a username, email, and password.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>manage.py<span class="w"> </span>createsuperuser
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="running-the-application">
+<h2>Running the Application<a class="headerlink" href="#running-the-application" title="Link to this heading">¶</a></h2>
+<p>Once the setup is complete, run the local development server:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>manage.py<span class="w"> </span>runserver
+</pre></div>
+</div>
+<p>Access the application at <cite>http://127.0.0.1:8000/</cite>. Login with the username and password created in previous step.</p>
+</section>
+<section id="authentication">
+<h2>Authentication<a class="headerlink" href="#authentication" title="Link to this heading">¶</a></h2>
+<p>The main dashboard view (<code class="docutils literal notranslate"><span class="pre">ClaimListView</span></code>) requires authentication. Unauthenticated users are redirected to the login page (<code class="docutils literal notranslate"><span class="pre">/login/</span></code>). You can either:</p>
+<ul class="simple">
+<li><p>Log in using the superuser created above, or</p></li>
+<li><p>Visit <code class="docutils literal notranslate"><span class="pre">/register/</span></code> to create a basic account, then log in.</p></li>
+</ul>
+</section>
+<section id="running-the-test-suite">
+<h2>Running the Test Suite<a class="headerlink" href="#running-the-test-suite" title="Link to this heading">¶</a></h2>
+<p>Run the test suite.</p>
+<section id="run-basic-tests">
+<h3>Run Basic Tests<a class="headerlink" href="#run-basic-tests" title="Link to this heading">¶</a></h3>
+<blockquote>
+<div><p>This command runs all tests within the <code class="docutils literal notranslate"><span class="pre">claims</span></code> app and provides detailed output.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>manage.py<span class="w"> </span><span class="nb">test</span><span class="w"> </span>claims<span class="w"> </span>--verbosity<span class="o">=</span><span class="m">2</span>
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="check-test-coverage">
+<h3>Check Test Coverage<a class="headerlink" href="#check-test-coverage" title="Link to this heading">¶</a></h3>
+<blockquote>
+<div><p>Click to see the total <a class="reference external" href="coverage/index.html">test coverage.</a>
+To calculate total test coverage locally, use the <code class="docutils literal notranslate"><span class="pre">coverage</span></code> package.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># First, run the tests under coverage monitoring</span>
+coverage<span class="w"> </span>run<span class="w"> </span>manage.py<span class="w"> </span><span class="nb">test</span><span class="w"> </span>claims
+
+<span class="c1"># Then, generate a simple report in the terminal</span>
+coverage<span class="w"> </span>report<span class="w"> </span>-m
+
+<span class="c1"># Or, generate a detailed, interactive HTML report</span>
+coverage<span class="w"> </span>html
+</pre></div>
+</div>
+<p>The HTML report <code class="docutils literal notranslate"><span class="pre">index.html</span></code> will be available in the <code class="docutils literal notranslate"><span class="pre">src/htmlcov</span></code> directory.</p>
+</div></blockquote>
+</section>
+</section>
+<section id="logs">
+<h2>Logs<a class="headerlink" href="#logs" title="Link to this heading">¶</a></h2>
+<p>Application logs are written to <code class="docutils literal notranslate"><span class="pre">logs/app.log</span></code> with rotation (see Django <code class="docutils literal notranslate"><span class="pre">LOGGING</span></code> settings). This can be helpful when running data ingestion to review summaries and any row-level errors.</p>
+</section>
+<section id="csv-file-schemas">
+<h2>CSV File Schemas<a class="headerlink" href="#csv-file-schemas" title="Link to this heading">¶</a></h2>
+<p>Claims CSV:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>id,patient_name,billed_amount,paid_amount,status,insurer_name,discharge_date
+101,Jane Smith,1200.50,1000.00,PAID,Acme Insurance,2025-09-01
+</pre></div>
+</div>
+<p>Claim Details CSV:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>id,claim_id,cpt_codes,denial_reason
+1,101,&quot;99214,99215&quot;,&quot;Prior authorization required&quot;
+</pre></div>
+</div>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Status values are normalized to upper-case and must be one of <code class="docutils literal notranslate"><span class="pre">PAID</span></code>, <code class="docutils literal notranslate"><span class="pre">DENIED</span></code>, or <code class="docutils literal notranslate"><span class="pre">UNDER</span> <span class="pre">REVIEW</span></code>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">cpt_codes</span></code> field expects a comma-separated list of codes. The UI renders each code as a tag.</p></li>
+<li><p>In overwrite mode, deleting Claims cascades to related ClaimDetail and Note records.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+        </div>
+      </div>
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+            <input type="text" name="q" placeholder="Search..." />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#project-setup">Project Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#database-setup-and-data-loading">Database Setup and Data Loading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-application">Running the Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#authentication">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-test-suite">Running the Test Suite</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#run-basic-tests">Run Basic Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#check-test-coverage">Check Test Coverage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#logs">Logs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#csv-file-schemas">CSV File Schemas</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="how_it_works.html">How the Application Works</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="how_it_works.html#typical-user-session">Typical User Session</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="url_endpoints.html">URL Endpoint Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="url_endpoints.html#claims-app-endpoints">claims App Endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="url_endpoints.html#project-level-endpoints">Project-Level Endpoints</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="template_reference.html">Frontend: Template Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="template_reference.html#core-layout">Core Layout</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#base-html"><code class="docutils literal notranslate"><span class="pre">base.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="template_reference.html#authentication">Authentication</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#registration-login-html"><code class="docutils literal notranslate"><span class="pre">registration/login.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="template_reference.html#claims-application-templates">Claims Application Templates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-claim-list-html"><code class="docutils literal notranslate"><span class="pre">claims/claim_list.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="template_reference.html#htmx-partials">HTMX Partials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-partials-claims-table-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claims_table.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-partials-claim-rows-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claim_rows.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-partials-claim-detail-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claim_detail.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-partials-notes-section-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_notes_section.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-partials-flag-button-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_flag_button.html</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="claims_app.html">Backend: The <cite>claims</cite> App</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="claims_app.html#module-claims.views">Views</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.views.AddNoteView"><code class="docutils literal notranslate"><span class="pre">AddNoteView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.views.ClaimDetailView"><code class="docutils literal notranslate"><span class="pre">ClaimDetailView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.views.ClaimListView"><code class="docutils literal notranslate"><span class="pre">ClaimListView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.views.FlagButtonView"><code class="docutils literal notranslate"><span class="pre">FlagButtonView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.views.RegisterView"><code class="docutils literal notranslate"><span class="pre">RegisterView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.views.ToggleFlagView"><code class="docutils literal notranslate"><span class="pre">ToggleFlagView</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="claims_app.html#module-claims.models">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.models.Claim"><code class="docutils literal notranslate"><span class="pre">Claim</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.models.ClaimDetail"><code class="docutils literal notranslate"><span class="pre">ClaimDetail</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.models.Note"><code class="docutils literal notranslate"><span class="pre">Note</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="claims_app.html#module-claims.services">Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.services.ClaimDataIngestor"><code class="docutils literal notranslate"><span class="pre">ClaimDataIngestor</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="claims_app.html#module-claims.management.commands.load_claim_data">Management Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.management.commands.load_claim_data.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="claims_app.html#module-claims.templatetags.claim_tags">Template Tags</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.templatetags.claim_tags.sort_indicator"><code class="docutils literal notranslate"><span class="pre">sort_indicator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.templatetags.claim_tags.sort_url"><code class="docutils literal notranslate"><span class="pre">sort_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.templatetags.claim_tags.split"><code class="docutils literal notranslate"><span class="pre">split()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  
+
+
+        </div>
+
+        
+
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="_sources/getting_started.rst.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2025, yashr
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/Autophagy/insegel">Insegel</a>
+
+        </div>
+    </div>
+
+    <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+    <script type="text/javascript">
+      $("#menu-toggle").click(function() {
+        $("#menu-toggle").toggleClass("toggled");
+        $("#side-menu-container").slideToggle(300);
+      });
+    </script>
+
+</footer> 
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>ERISA Recovery Challenge :: How the Application Works</title>
+  
+
+  <link rel="icon" type="image/png" sizes="32x32" href="_static/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="_static/img/favicon-16x16.png">
+  <link rel="index" title="Index" href="genindex.html"/>
+
+  <link rel="stylesheet" href="_static/css/insegel.css"/>
+  <link rel="stylesheet" href="_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/sphinx_highlight.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="insegel-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>ERISA Recovery Challenge</h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+    </header>
+
+    <div id="content-container">
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <section id="how-the-application-works">
+<span id="how-it-works"></span><h1>How the Application Works<a class="headerlink" href="#how-the-application-works" title="Link to this heading">¶</a></h1>
+<section id="typical-user-session">
+<h2>Typical User Session<a class="headerlink" href="#typical-user-session" title="Link to this heading">¶</a></h2>
+<p><strong>a. The Initial Page Load</strong></p>
+<ol class="arabic simple">
+<li><p>The user navigates to the root URL (<code class="docutils literal notranslate"><span class="pre">/</span></code>).</p></li>
+<li><p>Django’s URL resolver matches this path to the <code class="docutils literal notranslate"><span class="pre">ClaimListView</span></code>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ClaimListView</span></code> fetches the first 50 claim records from the database.</p></li>
+<li><p>It then renders the main <code class="docutils literal notranslate"><span class="pre">claim_list.html</span></code> template. This template extends <code class="docutils literal notranslate"><span class="pre">base.html</span></code> to create the full page, and includes the <code class="docutils literal notranslate"><span class="pre">_claims_table.html</span></code> partial to render the initial set of data.</p></li>
+<li><p>The final, complete HTML page is sent to the user’s browser.</p></li>
+</ol>
+<p><strong>b. The User Clicks a Claim</strong></p>
+<ol class="arabic simple">
+<li><p>The user clicks on a table row (e.g., Claim ID 101).</p></li>
+<li><p>HTMX intercepts this click. The <code class="docutils literal notranslate"><span class="pre">&lt;tr&gt;</span></code> element has an attribute like <code class="docutils literal notranslate"><span class="pre">hx-get=&quot;/claim/101/&quot;</span></code>.</p></li>
+<li><p>HTMX sends a <code class="docutils literal notranslate"><span class="pre">GET</span></code> request to <code class="docutils literal notranslate"><span class="pre">/claim/101/</span></code> in the background.</p></li>
+<li><p>Django’s URL resolver matches this to the <code class="docutils literal notranslate"><span class="pre">ClaimDetailView</span></code>.</p></li>
+<li><p>The view fetches the specific details for Claim 101, including its notes.</p></li>
+<li><p>It renders the <code class="docutils literal notranslate"><span class="pre">_claim_detail.html</span></code> partial without rendering a full page.</p></li>
+<li><p>This small snippet of HTML is sent back to the browser. HTMX then takes this snippet and inserts it as a detail table row (a new <code class="docutils literal notranslate"><span class="pre">&lt;tr&gt;</span></code>) immediately after the clicked row — no full page reload.</p></li>
+</ol>
+<p><strong>c. The User Flags the Claim</strong></p>
+<ol class="arabic simple">
+<li><p>Inside the claim detail view, the user clicks the “Flag for Review” button.</p></li>
+<li><p>This button has HTMX attributes like <code class="docutils literal notranslate"><span class="pre">hx-post=&quot;/claim/101/toggle-flag/&quot;</span></code>.</p></li>
+<li><p>HTMX sends a <code class="docutils literal notranslate"><span class="pre">POST</span></code> request to that URL.</p></li>
+<li><p>Django’s URL resolver routes this to the <code class="docutils literal notranslate"><span class="pre">ToggleFlagView</span></code>.</p></li>
+<li><p>The view finds Claim 101, toggles its <code class="docutils literal notranslate"><span class="pre">is_flagged</span></code> status, and saves the change to the database.</p></li>
+<li><p>The view then renders the <code class="docutils literal notranslate"><span class="pre">_flag_button.html</span></code> partial with the button’s new state.</p></li>
+<li><p>This tiny HTML snippet is sent back, and HTMX swaps the old button with the new one. The user sees the button change state immediately.</p></li>
+</ol>
+<p><strong>d. The User Searches for “Aetna”</strong></p>
+<ol class="arabic simple">
+<li><p>The user types “Aetna” into the search box and presses Enter.</p></li>
+<li><p>The search input has HTMX attributes: <code class="docutils literal notranslate"><span class="pre">hx-get=&quot;/&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">hx-target=&quot;#claims-table-wrapper&quot;</span></code>.</p></li>
+<li><p>HTMX sends a <code class="docutils literal notranslate"><span class="pre">GET</span></code> request to the root URL, but this time it includes the search query: <code class="docutils literal notranslate"><span class="pre">/?search=Aetna</span></code>.</p></li>
+<li><p>This request goes back to the <strong>same</strong> <code class="docutils literal notranslate"><span class="pre">ClaimListView</span></code> as the initial page load.</p></li>
+<li><p>However, the view detects the <code class="docutils literal notranslate"><span class="pre">search</span></code> parameter in the URL. Its <code class="docutils literal notranslate"><span class="pre">get_queryset</span></code> method adds a <code class="docutils literal notranslate"><span class="pre">.filter()</span></code> clause to the database query, fetching only the claims matching “Aetna”.</p></li>
+<li><p>The view also detects that this is an HTMX request, so it renders the <code class="docutils literal notranslate"><span class="pre">_claims_table.html</span></code> partial, not the full page.</p></li>
+<li><p>HTMX receives the updated table and replaces the content of the wrapper (<code class="docutils literal notranslate"><span class="pre">#claims-table-wrapper</span></code>) to show only the search results.</p></li>
+</ol>
+</section>
+</section>
+
+
+        </div>
+      </div>
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+            <input type="text" name="q" placeholder="Search..." />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#project-setup">Project Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#database-setup-and-data-loading">Database Setup and Data Loading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#running-the-application">Running the Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#authentication">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#running-the-test-suite">Running the Test Suite</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#run-basic-tests">Run Basic Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#check-test-coverage">Check Test Coverage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#logs">Logs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#csv-file-schemas">CSV File Schemas</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#notes">Notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How the Application Works</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#typical-user-session">Typical User Session</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="url_endpoints.html">URL Endpoint Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="url_endpoints.html#claims-app-endpoints">claims App Endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="url_endpoints.html#project-level-endpoints">Project-Level Endpoints</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="template_reference.html">Frontend: Template Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="template_reference.html#core-layout">Core Layout</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#base-html"><code class="docutils literal notranslate"><span class="pre">base.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="template_reference.html#authentication">Authentication</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#registration-login-html"><code class="docutils literal notranslate"><span class="pre">registration/login.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="template_reference.html#claims-application-templates">Claims Application Templates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-claim-list-html"><code class="docutils literal notranslate"><span class="pre">claims/claim_list.html</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="template_reference.html#htmx-partials">HTMX Partials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-partials-claims-table-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claims_table.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-partials-claim-rows-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claim_rows.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-partials-claim-detail-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_claim_detail.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-partials-notes-section-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_notes_section.html</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="template_reference.html#claims-partials-flag-button-html"><code class="docutils literal notranslate"><span class="pre">claims/partials/_flag_button.html</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="claims_app.html">Backend: The <cite>claims</cite> App</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="claims_app.html#module-claims.views">Views</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.views.AddNoteView"><code class="docutils literal notranslate"><span class="pre">AddNoteView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.views.ClaimDetailView"><code class="docutils literal notranslate"><span class="pre">ClaimDetailView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.views.ClaimListView"><code class="docutils literal notranslate"><span class="pre">ClaimListView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.views.FlagButtonView"><code class="docutils literal notranslate"><span class="pre">FlagButtonView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.views.RegisterView"><code class="docutils literal notranslate"><span class="pre">RegisterView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.views.ToggleFlagView"><code class="docutils literal notranslate"><span class="pre">ToggleFlagView</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="claims_app.html#module-claims.models">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.models.Claim"><code class="docutils literal notranslate"><span class="pre">Claim</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.models.ClaimDetail"><code class="docutils literal notranslate"><span class="pre">ClaimDetail</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.models.Note"><code class="docutils literal notranslate"><span class="pre">Note</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="claims_app.html#module-claims.services">Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.services.ClaimDataIngestor"><code class="docutils literal notranslate"><span class="pre">ClaimDataIngestor</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="claims_app.html#module-claims.management.commands.load_claim_data">Management Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.management.commands.load_claim_data.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="claims_app.html#module-claims.templatetags.claim_tags">Template Tags</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.templatetags.claim_tags.sort_indicator"><code class="docutils literal notranslate"><span class="pre">sort_indicator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.templatetags.claim_tags.sort_url"><code class="docutils literal notranslate"><span class="pre">sort_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="claims_app.html#claims.templatetags.claim_tags.split"><code class="docutils literal notranslate"><span class="pre">split()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  
+
+
+        </div>
+
+        
+
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="_sources/how_it_works.rst.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2025, yashr
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/Autophagy/insegel">Insegel</a>
+
+        </div>
+    </div>
+
+    <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+    <script type="text/javascript">
+      $("#menu-toggle").click(function() {
+        $("#menu-toggle").toggleClass("toggled");
+        $("#side-menu-container").slideToggle(300);
+      });
+    </script>
+
+</footer> 
+
+</div>
+
+</body>
+</html>
