@@ -138,7 +138,7 @@ Run Basic Tests
 Check Test Coverage
 ^^^^^^^^^^^^^^^^^^^
 
-    Click to see the total `test coverage. <htmlcov/index.html>`_
+    Click to see the total `test coverage. <coverage/index.html>`_
     To calculate total test coverage locally, use the ``coverage`` package.
 
     .. code-block:: bash
